@@ -5,7 +5,10 @@ This specification is one of several related specifications. The single most imp
 The foundation upon which the specifications are built is the Reference model for an Open Archival Information System (OAIS) (OAIS Reference model) which has Information Packages as its basis. Familiarity with the core functional entities of OAIS is a prerequisite for understanding the specifications.
 A visualisation of the current specification network can be seen here:
 
-** IMAGE HERE **
+<a name="figi-dip"></a>
+![OAIS Entities](figs/Fig1DIP.svg "Diagram showing E-ARK specification dependency hierarchy.")
+
+**Figure I:** Diagram showing E-ARK specification dependency hierarchy.
 
 | Specification | Aim and Goals  |
 |---------------|----------------|
