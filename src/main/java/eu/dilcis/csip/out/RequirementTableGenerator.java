@@ -7,8 +7,8 @@ import java.util.List;
 import eu.dilcis.csip.profile.Requirement;
 
 public class RequirementTableGenerator {
-	final static String[] tableHeadings = { "ID", "Name & Location", //$NON-NLS-1$ //$NON-NLS-2$
-			"Description & usage", "Cardinality & Level" };  //$NON-NLS-1$ //$NON-NLS-2$
+	final static String[] tableHeadings = { " ID ", "Name & Loc", //$NON-NLS-1$ //$NON-NLS-2$
+			"Description & usage", "Card & Level" };  //$NON-NLS-1$ //$NON-NLS-2$
 
 	final List<Requirement> requirements = new ArrayList<>();
 
