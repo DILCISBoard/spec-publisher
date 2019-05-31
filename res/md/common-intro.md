@@ -6,7 +6,7 @@ The foundation upon which the specifications are built is the Reference model fo
 A visualisation of the current specification network can be seen here:
 
 <a name="figi-dip"></a>
-![OAIS Entities](figs/Fig1DIP.svg "Diagram showing E-ARK specification dependency hierarchy.")
+![OAIS Entities](figs/fig_1_dip.svg "Diagram showing E-ARK specification dependency hierarchy")
 
 **Figure I:** Diagram showing E-ARK specification dependency hierarchy.
 
