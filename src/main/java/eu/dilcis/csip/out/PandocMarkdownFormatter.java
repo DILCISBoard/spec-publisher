@@ -112,7 +112,7 @@ enum PandocMarkdownFormatter {
 	}
 
 	static String tableHeadingsLine(final String[] headings) {
-		StringBuilder headersLine = new StringBuilder(cellDivOpen);
+		StringBuilder headersLine = new StringBuilder().append(cellDivOpen);
 		for (final String heading : headings) {
 			headersLine.append(heading).append(cellDivCls);
 		}
@@ -120,7 +120,7 @@ enum PandocMarkdownFormatter {
 	}
 
 	static String tableRowLine(final String[] headings) {
-		StringBuilder rowLine = new StringBuilder(plus);
+		StringBuilder rowLine = new StringBuilder().append(plus);
 		for (final String heading : headings) {
 			rowLine.append(decortatorLine(heading, hyphen)).append(plus);
 		}
@@ -128,7 +128,7 @@ enum PandocMarkdownFormatter {
 	}
 
 	static String tableHeadingLine(final String[] headings) {
-		StringBuilder headingLine = new StringBuilder(plus);
+		StringBuilder headingLine = new StringBuilder().append(plus);
 		for (final String heading : headings) {
 			headingLine.append(decortatorLine(heading, equals)).append(plus);
 		}
