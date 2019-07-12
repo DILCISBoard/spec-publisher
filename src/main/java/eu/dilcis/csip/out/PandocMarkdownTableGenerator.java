@@ -63,7 +63,7 @@ public class PandocMarkdownTableGenerator implements RequirementTableGenerator {
 	static void tableRow(OutputHandler outputHandler, final Requirement req)
 			throws IOException {
 		outputHandler.emit(PandocMarkdownFormatter
-				.anchorCell(req.id.prefix + req.id.number, true));
+				.cell(req.id.prefix + req.id.number, true));
 		outputHandler.emit(PandocMarkdownFormatter.cell(nameString(req)));
 		StringBuffer desc = new StringBuffer(
 				PandocMarkdownFormatter.concatDescription(req.description));
