@@ -1,5 +1,6 @@
 package eu.dilcis.csip.out;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,15 +13,19 @@ import java.util.List;
  *          Created 17 Nov 2018:16:17:30
  */
 
-enum MarkdownFormatter {
+enum PandocMarkdownFormatter {
 	INSTANCE;
 	// Markdown Tags
 	private final static String empty = ""; //$NON-NLS-1$
 	private final static String space = " "; //$NON-NLS-1$
-	private final static String cellDiv = "|"; //$NON-NLS-1$
+	private final static String pipe = "|"; //$NON-NLS-1$
+	private final static char colon = ':';
+	private final static char equals = '=';
+	private final static char hyphen = '-';
+	private final static char plus = '+';
+	private final static String cellDiv = pipe; //$NON-NLS-1$
 	private final static String cellDivCls = space + cellDiv; // $NON-NLS-1$
 	private final static String cellDivOpen = cellDiv + space; // $NON-NLS-1$
-	private final static char hyphen = '-';
 	private final static String mdBoldMarker = "**"; //$NON-NLS-1$
 	private final static String mdConsoleMarker = "`"; //$NON-NLS-1$
 	final static String mdInlineMarker = "```"; //$NON-NLS-1$
@@ -104,9 +109,37 @@ enum MarkdownFormatter {
 	}
 
 	static String makeHeadingLines(final String heading) {
-		int len = (heading == null || heading.isEmpty()) ? 1 : heading.length();
+		return decortatorLine(heading, hyphen);
+	}
+
+	static String tableHeadingsLine(final String[] headings) {
+		StringBuilder headersLine = new StringBuilder(cellDivOpen);
+		for (final String heading : headings) {
+			headersLine.append(heading).append(cellDivCls);
+		}
+		 return headersLine.toString();
+	}
+
+	static String tableRowLine(final String[] headings) {
+		StringBuilder rowLine = new StringBuilder(plus);
+		for (final String heading : headings) {
+			rowLine.append(decortatorLine(heading, hyphen)).append(plus);
+		}
+		return rowLine.toString();
+	}
+
+	static String tableHeadingLine(final String[] headings) {
+		StringBuilder headingLine = new StringBuilder(plus);
+		for (final String heading : headings) {
+			headingLine.append(decortatorLine(heading, equals)).append(plus);
+		}
+		return headingLine.toString();
+	}
+
+	static String decortatorLine(final String source, final char decorator) {
+		int len = (source == null || source.isEmpty()) ? 1 : source.length();
 		char[] chars = new char[len];
-		Arrays.fill(chars, hyphen);
+		Arrays.fill(chars, decorator);
 		return new String(chars);
 	}
 

@@ -47,13 +47,13 @@ public final class SchemaAppendixGenerator {
 
 	public void generateAppendix(final Path projRoot) throws IOException {
 		OutputHandler handler = OutputHandler.toAppendix(projRoot, "schema"); //$NON-NLS-1$
-		handler.emit(MarkdownFormatter.h2("External Schema"));
+		handler.emit(GitHubMarkdownFormatter.h2("External Schema"));
 		handler.nl();
 		for (ExternalSchema scheme : this.schema) {
 			handler.nl();
-			handler.emit(MarkdownFormatter.h3(scheme.name));
+			handler.emit(GitHubMarkdownFormatter.h3(scheme.name));
 			handler.nl();
-			handler.emit(headString("Location:", MarkdownFormatter.href(scheme.url.toString(), scheme.url.toString())));
+			handler.emit(headString("Location:", GitHubMarkdownFormatter.href(scheme.url.toString(), scheme.url.toString())));
 			handler.nl();
 			handler.emit(headString("Context:", scheme.context));
 			handler.nl();
@@ -61,22 +61,22 @@ public final class SchemaAppendixGenerator {
 			handler.nl();
 			for (String para : scheme.note) {
 				handler.emit(para);
-				handler.emit(MarkdownFormatter.htmlBr);
+				handler.emit(GitHubMarkdownFormatter.htmlBr);
 				handler.nl();
 			}
 			handler.nl();
 		}
-		handler.emit(MarkdownFormatter.h2("Controlled Vocabularies"));
+		handler.emit(GitHubMarkdownFormatter.h2("Controlled Vocabularies"));
 		handler.nl();
 		for (ControlledVocabulary vocab : this.vocabs) {
 			handler.nl();
-			handler.emit(MarkdownFormatter.h3(vocab.name));
+			handler.emit(GitHubMarkdownFormatter.h3(vocab.name));
 			handler.nl();
-			handler.emit(MarkdownFormatter.anchor(vocab.id));
+			handler.emit(GitHubMarkdownFormatter.anchor(vocab.id));
 			handler.nl();
 			handler.emit(headString("Maintained By:", vocab.maintenanceAgency));
 			handler.nl();
-			handler.emit(headString("Location:", MarkdownFormatter.href(vocab.uri.toString(), vocab.uri.toString())));
+			handler.emit(headString("Location:", GitHubMarkdownFormatter.href(vocab.uri.toString(), vocab.uri.toString())));
 			handler.nl();
 			handler.emit(headString("Context:", vocab.context));
 			handler.nl();
@@ -84,7 +84,7 @@ public final class SchemaAppendixGenerator {
 			handler.nl();
 			for (String para : vocab.description) {
 				handler.emit(para);
-				handler.emit(MarkdownFormatter.htmlBr);
+				handler.emit(GitHubMarkdownFormatter.htmlBr);
 				handler.nl();
 			}
 			handler.nl();
@@ -92,10 +92,10 @@ public final class SchemaAppendixGenerator {
 	}
 
 	private static String headString(final String head, final String val) {
-		StringBuffer buff = new StringBuffer(MarkdownFormatter.makeBold(head));
+		StringBuffer buff = new StringBuffer(GitHubMarkdownFormatter.makeBold(head));
 		buff.append(" ");
 		buff.append(val);
-		buff.append(MarkdownFormatter.htmlBr);
+		buff.append(GitHubMarkdownFormatter.htmlBr);
 		return buff.toString();
 	}
 }

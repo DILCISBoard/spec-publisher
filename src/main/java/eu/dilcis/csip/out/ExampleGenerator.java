@@ -40,15 +40,15 @@ public final class ExampleGenerator extends XmlFragmentGenerator {
 	private void strExmpl(final String head, final String label)
 			throws IOException {
 		this.handler.nl();
-		this.handler.emit(MarkdownFormatter.makeBold(head) + space + label);
+		this.handler.emit(GitHubMarkdownFormatter.makeBold(head) + space + label);
 		this.handler.nl();
 		this.handler.nl();
-		this.handler.emit(MarkdownFormatter.mdInlineXml);
+		this.handler.emit(GitHubMarkdownFormatter.mdInlineXml);
 	}
 
 	public void endExample() throws IOException {
 		this.handler.nl();
-		this.handler.emit(MarkdownFormatter.mdInlineMarker);
+		this.handler.emit(GitHubMarkdownFormatter.mdInlineMarker);
 		this.handler.nl();
 		this.handler.nl();
 	}
