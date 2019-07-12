@@ -19,6 +19,7 @@ import eu.dilcis.csip.ProcessorOptions;
 import eu.dilcis.csip.out.ExampleGenerator;
 import eu.dilcis.csip.out.GitHubMarkdownTableGenerator;
 import eu.dilcis.csip.out.OutputHandler;
+import eu.dilcis.csip.out.PandocMarkdownTableGenerator;
 import eu.dilcis.csip.out.RequirementTableGenerator;
 import eu.dilcis.csip.out.SchemaAppendixGenerator;
 import eu.dilcis.csip.out.XmlCharBuffer;
@@ -107,7 +108,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
 	// ===========================================================
 
 	public void processProfile() throws SAXException, IOException {
-		this.reqsAppndxGen = GitHubMarkdownTableGenerator.instance();
+		this.reqsAppndxGen = PandocMarkdownTableGenerator.instance();
 		saxParser.parse(this.opts.profileFile.toFile(), this);
 	}
 
