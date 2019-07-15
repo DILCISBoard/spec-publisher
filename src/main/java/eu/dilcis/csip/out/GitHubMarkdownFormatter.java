@@ -122,11 +122,9 @@ enum GitHubMarkdownFormatter {
 	}
 	
 	static String href(final String href, final String textVal) {
-		StringBuffer buff = new StringBuffer(hrefEleStart); //$NON-NLS-1$
-		buff.append(href);
-		buff.append("\" >"); //$NON-NLS-1$
-		buff.append(textVal);
-		buff.append("</a>"); //$NON-NLS-1$
+		StringBuffer buff = new StringBuffer("["); //$NON-NLS-1$
+		buff.append(textVal + "](");
+		buff.append(href + ")");
 		return buff.toString();
 	}
 }
