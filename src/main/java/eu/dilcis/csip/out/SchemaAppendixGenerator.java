@@ -44,6 +44,10 @@ public final class SchemaAppendixGenerator {
 	public static String getVocabName(final String id) {
 		return SchemaAppendixGenerator.vocabLookup.get(id);
 	}
+	
+	static String pandocLink(final String link) {
+		return " {#" + link + "}";
+	}
 
 	public void generateAppendix(final Path projRoot) throws IOException {
 		OutputHandler handler = OutputHandler.toAppendix(projRoot, "schema"); //$NON-NLS-1$
@@ -71,6 +75,7 @@ public final class SchemaAppendixGenerator {
 		for (ControlledVocabulary vocab : this.vocabs) {
 			handler.nl();
 			handler.emit(GitHubMarkdownFormatter.h3(vocab.name));
+			handler.emit(pandocLink(vocab.id));
 			handler.nl();
 			handler.emit(GitHubMarkdownFormatter.anchor(vocab.id));
 			handler.nl();
