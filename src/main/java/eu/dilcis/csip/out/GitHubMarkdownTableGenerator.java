@@ -78,7 +78,7 @@ public class GitHubMarkdownTableGenerator implements RequirementTableGenerator {
 	static String descCellText(final Requirement req) {
 		
 		String target = "\\vtop{\\hbox{\\strut \\textbf{Package Identifier}}\\hbox{\\strut \\lstinline!mets/@OBJID!}}";
-		StringBuffer buff = new StringBuffer("\\vtop{\\hbox{\\strut \\textbf{" + nameString(req) + "}}\\hbox{\\strut \\lstinline!" + req.xPath + "!}}");
+		StringBuffer buff = new StringBuffer("\\vtop{\\hbox{\\strut \\textbf{" + req.name + "}}\\hbox{\\strut \\lstinline!" + req.xPath + "!}}");
 		buff.append(GitHubMarkdownFormatter.htmlBr);
 		buff.append(GitHubMarkdownFormatter.concatDescription(req.description));
 		relatedMatter(buff, req.relatedMatter());
