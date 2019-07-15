@@ -8,33 +8,40 @@ import java.util.List;
 import eu.dilcis.csip.profile.Requirement;
 
 public class GitHubMarkdownTableGenerator implements RequirementTableGenerator {
-	final static String[] tableHeadings = { " ID ", "Name & Loc", //$NON-NLS-1$ //$NON-NLS-2$
-			"Description & usage", "Card & Level" };  //$NON-NLS-1$ //$NON-NLS-2$
-
-	final List<Requirement> requirements = new ArrayList<>();
 
 	private GitHubMarkdownTableGenerator() {
 		super();
 	}
 
+	public static RequirementTableGenerator instance() {
+		return new GitHubMarkdownTableGenerator();
+	}
+
+	protected final static String[] tableHeadings = { " ID    ", "Name, Location & Description", "Card & Level" }; //$NON-NLS-1$ //$NON-NLS-2$
+	protected final List<Requirement> requirements = new ArrayList<>();
+
+	@Override
 	public List<String> getHeadings() {
 		return Arrays.asList(tableHeadings);
 	}
 
+	@Override
 	public int size() {
 		return this.requirements.size();
 	}
 
+	@Override
 	public boolean add(Requirement req) {
 		return this.requirements.add(req);
 	}
 
-	public void toTable(final OutputHandler outHandler) throws IOException {
-		this.toTable(outHandler, true);
+	@Override
+	public void toTable(OutputHandler handler) throws IOException {
+		this.toTable(handler, true);
 	}
 
-	public void toTable(final OutputHandler outHandler, boolean addHeader)
-			throws IOException {
+	@Override
+	public void toTable(final OutputHandler outHandler, boolean addHeader) throws IOException {
 		if (this.requirements.isEmpty())
 			return;
 		if (addHeader)
@@ -42,10 +49,6 @@ public class GitHubMarkdownTableGenerator implements RequirementTableGenerator {
 		for (Requirement req : this.requirements) {
 			tableRow(outHandler, req);
 		}
-	}
-
-	public static RequirementTableGenerator instance() {
-		return new GitHubMarkdownTableGenerator();
 	}
 
 	static void tableHeading(final OutputHandler outHandler)
