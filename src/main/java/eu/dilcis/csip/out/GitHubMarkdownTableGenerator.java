@@ -70,15 +70,18 @@ public class GitHubMarkdownTableGenerator implements RequirementTableGenerator {
 			throws IOException {
 		outputHandler.emit(GitHubMarkdownFormatter
 				.anchorCell(req.id.prefix + req.id.number, true));
-		outputHandler.emit(GitHubMarkdownFormatter.cell(nameString(req)));
-		StringBuffer desc = new StringBuffer(
-				GitHubMarkdownFormatter.concatDescription(req.description));
-		desc = relatedMatter(desc, req.relatedMatter());
-		outputHandler.emit(GitHubMarkdownFormatter.cell(desc.toString()));
+		outputHandler.emit(GitHubMarkdownFormatter.cell(descCellText(req)));
 		outputHandler.emit(GitHubMarkdownFormatter.cell(cardString(req)));
 		outputHandler.nl();
 	}
 
+	static String descCellText(final Requirement req) {
+		StringBuffer buff = new StringBuffer(nameString(req));
+		buff.append(GitHubMarkdownFormatter.htmlBr);
+		buff.append(GitHubMarkdownFormatter.concatDescription(req.description));
+		relatedMatter(buff, req.relatedMatter());
+		return buff.toString();
+	}
 	static String cardString(final Requirement req) {
 		return boldHeadPair(req.cardinality, req.reqLevel);
 	}
