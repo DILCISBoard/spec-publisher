@@ -78,8 +78,9 @@ public final class SchemaAppendixGenerator {
 			handler.nl();
 			handler.emit(GitHubMarkdownFormatter.h3(vocab.name));
 			handler.emit("  ");
-			handler.nl();
 			handler.emit(pandocLink(vocab.id));
+			handler.emit("  ");
+			handler.nl();
 			handler.emit("  ");
 			handler.nl();
 			handler.emit(GitHubMarkdownFormatter.anchor(vocab.id));
