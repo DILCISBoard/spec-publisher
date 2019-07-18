@@ -134,7 +134,13 @@ public final class SchemaAppendixGenerator {
 		return buff.toString();
 	}
 	
+	private static String strut(final String val) {
+		StringBuffer buff = new StringBuffer(strut);
+		buff.append(val);
+		return buff.toString();
+	}
+	
 	private static String pandocTableLine(final String val) {
-		return vtop(hbox(val));
+		return vtop(hbox(strut(val)));
 	}
 }
