@@ -81,21 +81,19 @@ public final class SchemaAppendixGenerator {
 			handler.emit(pandocLink(vocab.id));
 			handler.emit("  ");
 			handler.nl();
-			handler.emit("  ");
-			handler.nl();
 			handler.emit(GitHubMarkdownFormatter.anchor(vocab.id));
 			handler.emit("  ");
 			handler.nl();
-			handler.emit(headString("Maintained By:", vocab.maintenanceAgency));
+			handler.emit(pandocTableLine(pandocHeadString("Maintained By:", vocab.maintenanceAgency)));
 			handler.emit("  ");
 			handler.nl();
-			handler.emit(headString("Location:", GitHubMarkdownFormatter.href(vocab.uri.toString(), vocab.uri.toString())));
+			handler.emit(pandocTableLine(pandocHeadString("Location:", GitHubMarkdownFormatter.href(vocab.uri.toString(), vocab.uri.toString()))));
 			handler.emit("  ");
 			handler.nl();
-			handler.emit(headString("Context:", vocab.context));
+			handler.emit(pandocTableLine(pandocHeadString("Context:", vocab.context)));
 			handler.emit("  ");
 			handler.nl();
-			handler.emit(headString("Description:", " "));
+			handler.emit(pandocTableLine(pandocHeadString("Description:", " ")));
 			handler.nl();
 			for (String para : vocab.description) {
 				handler.emit(para);
