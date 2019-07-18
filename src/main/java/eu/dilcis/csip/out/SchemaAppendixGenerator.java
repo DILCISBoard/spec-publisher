@@ -76,11 +76,12 @@ public final class SchemaAppendixGenerator {
 		handler.nl();
 		for (ControlledVocabulary vocab : this.vocabs) {
 			handler.nl();
-			handler.emit(GitHubMarkdownFormatter.anchor(vocab.id));
-			handler.nl();
 			handler.emit(GitHubMarkdownFormatter.h3(vocab.name));
 			handler.emit("  ");
 			handler.emit(pandocLink(vocab.id));
+			handler.nl();
+			handler.emit(GitHubMarkdownFormatter.anchor(vocab.id));
+			handler.nl();
 			handler.nl();
 			handler.emit(headString("Maintained By:", vocab.maintenanceAgency));
 			handler.emit("  ");
