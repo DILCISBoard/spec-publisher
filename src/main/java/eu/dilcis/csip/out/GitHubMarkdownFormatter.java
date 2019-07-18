@@ -42,6 +42,15 @@ enum GitHubMarkdownFormatter {
 		return buff.toString();
 	}
 
+	static String makePandocBold(final String toBold) {
+		if (toBold == null || toBold.isEmpty())
+			return empty;
+		StringBuffer buff = new StringBuffer("\\\\textbf{");
+		buff.append(toBold);
+		buff.append("}");
+		return buff.toString();
+	}
+
 	static String makeConsole(final String toConsole) {
 		if (toConsole == null || toConsole.isEmpty())
 			return empty;
