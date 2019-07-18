@@ -84,7 +84,7 @@ public final class SchemaAppendixGenerator {
 			handler.emit(GitHubMarkdownFormatter.anchor(vocab.id));
 			handler.emit("  ");
 			handler.nl();
-			handler.emit(pandocTableLine(pandocHeadString("Maintained By:", vocab.maintenanceAgency)));
+			handler.emit(headString("Maintained By:", vocab.maintenanceAgency));
 			handler.emit("  ");
 			handler.nl();
 			handler.emit(headString("Location:", GitHubMarkdownFormatter.href(vocab.uri.toString(), vocab.uri.toString())));
@@ -97,7 +97,7 @@ public final class SchemaAppendixGenerator {
 			handler.nl();
 			for (String para : vocab.description) {
 				handler.emit(para);
-				handler.emit(GitHubMarkdownFormatter.htmlBr);
+				handler.emit("  ");
 				handler.nl();
 			}
 			handler.emit("  ");
@@ -109,7 +109,7 @@ public final class SchemaAppendixGenerator {
 		StringBuffer buff = new StringBuffer(GitHubMarkdownFormatter.makeBold(head));
 		buff.append(" ");
 		buff.append(val);
-		buff.append(GitHubMarkdownFormatter.htmlBr);
+		buff.append("   \n");
 		return buff.toString();
 	}
 
