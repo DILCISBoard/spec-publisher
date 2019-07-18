@@ -121,14 +121,14 @@ public final class SchemaAppendixGenerator {
 	}
 	
 	private static String vtop(final String val) {
-		StringBuffer buff = new StringBuffer(GitHubMarkdownFormatter.makePandocBold(vtop));
+		StringBuffer buff = new StringBuffer(vtop);
 		buff.append(val);
 		buff.append("}");
 		return buff.toString();
 	}
 	
 	private static String hbox(final String val) {
-		StringBuffer buff = new StringBuffer(GitHubMarkdownFormatter.makePandocBold(hbox));
+		StringBuffer buff = new StringBuffer(hbox);
 		buff.append(val);
 		buff.append("}");
 		return buff.toString();
