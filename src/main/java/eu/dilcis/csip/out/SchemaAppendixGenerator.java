@@ -88,7 +88,6 @@ public final class SchemaAppendixGenerator {
 			handler.emit("  ");
 			handler.nl();
 			handler.emit(headString("Location:", GitHubMarkdownFormatter.href(vocab.uri.toString(), vocab.uri.toString())));
-			handler.emit("  ");
 			handler.nl();
 			handler.emit(headString("Context:", vocab.context));
 			handler.emit("  ");
