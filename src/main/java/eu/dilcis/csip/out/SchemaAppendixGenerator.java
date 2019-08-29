@@ -107,16 +107,16 @@ public final class SchemaAppendixGenerator {
 		StringBuffer buff = new StringBuffer(GitHubMarkdownFormatter.makeBold(head));
 		buff.append(" ");
 		buff.append(val);
-		buff.append("   \n");
+//		buff.append("   \n");
 		return buff.toString();
 	}
 
-	private static String pandocHeadString(final String head, final String val) {
-		StringBuffer buff = new StringBuffer(GitHubMarkdownFormatter.makePandocBold(head));
-		buff.append(" ");
-		buff.append(val);
-		return buff.toString();
-	}
+//	private static String pandocHeadString(final String head, final String val) {
+//		StringBuffer buff = new StringBuffer(GitHubMarkdownFormatter.makePandocBold(head));
+//		buff.append(" ");
+//		buff.append(val);
+//		return buff.toString();
+//	}
 	
 	private static String vtop(final String val) {
 		StringBuffer buff = new StringBuffer(vtop);
