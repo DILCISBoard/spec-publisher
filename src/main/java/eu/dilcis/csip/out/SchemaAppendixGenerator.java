@@ -77,8 +77,8 @@ public final class SchemaAppendixGenerator {
 		for (ControlledVocabulary vocab : this.vocabs) {
 			handler.nl();
 			handler.emit(GitHubMarkdownFormatter.h3(vocab.name));
-			handler.emit("  ");
-			handler.emit(pandocLink(vocab.id));
+//			handler.emit("  ");
+//			handler.emit(pandocLink(vocab.id));
 			handler.nl();
 			handler.emit(GitHubMarkdownFormatter.anchor(vocab.id));
 			handler.nl();
@@ -107,7 +107,7 @@ public final class SchemaAppendixGenerator {
 		StringBuffer buff = new StringBuffer(GitHubMarkdownFormatter.makeBold(head));
 		buff.append(" ");
 		buff.append(val);
-//		buff.append("   \n");
+		buff.append("   \n");
 		return buff.toString();
 	}
 
