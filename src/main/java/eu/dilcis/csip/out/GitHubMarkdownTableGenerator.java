@@ -103,7 +103,8 @@ public class GitHubMarkdownTableGenerator implements RequirementTableGenerator {
 			return buff;
 		StringBuffer relMattBuff = new StringBuffer();
 		relMattBuff.append(GitHubMarkdownFormatter.htmlBr);
-		relMattBuff.append(GitHubMarkdownFormatter.makeBold("See also: ")); //$NON-NLS-1$
+		relMattBuff.append(GitHubMarkdownFormatter.makeBold("See also:")); //$NON-NLS-1$
+		relMattBuff.append(" ");
 		String prefix = relMattBuff.toString();
 		relMattBuff = new StringBuffer();
 		for (String id : ids) {
