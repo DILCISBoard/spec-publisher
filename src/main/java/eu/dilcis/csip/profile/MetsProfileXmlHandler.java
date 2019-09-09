@@ -17,6 +17,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import eu.dilcis.csip.ProcessorOptions;
 import eu.dilcis.csip.out.ExampleGenerator;
+import eu.dilcis.csip.out.GitHubMarkdownTableGenerator;
 import eu.dilcis.csip.out.OutputHandler;
 import eu.dilcis.csip.out.RequirementTableGenerator;
 import eu.dilcis.csip.out.SchemaAppendixGenerator;
@@ -106,7 +107,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
 	// ===========================================================
 
 	public void processProfile() throws SAXException, IOException {
-		this.reqsAppndxGen = RequirementTableGenerator.instance();
+		this.reqsAppndxGen = GitHubMarkdownTableGenerator.instance();
 		saxParser.parse(this.opts.profileFile.toFile(), this);
 	}
 
@@ -311,7 +312,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
 	private void startSection() {
 		this.currentSect = Section.fromEleName(this.currEleName);
 		this.exampleMap.put(this.currentSect, new HashSet<>());
-		this.tableGen = RequirementTableGenerator.instance();
+		this.tableGen = GitHubMarkdownTableGenerator.instance();
 	}
 
 	private void endSection() throws SAXException {
@@ -322,7 +323,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
 		} catch (IOException excep) {
 			throw new SAXException(ioExcepMess, excep);
 		}
-		this.reqCounter += this.tableGen.getRequirmentCount();
+		this.reqCounter += this.tableGen.size();
 	}
 
 	private void startExample(final Attributes attrs) throws SAXException {

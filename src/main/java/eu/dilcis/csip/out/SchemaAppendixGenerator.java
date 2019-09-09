@@ -20,7 +20,9 @@ import eu.dilcis.csip.profile.ExternalSchema;
  */
 
 public final class SchemaAppendixGenerator {
-
+	static final String vtop ="\\\\vtop{";
+	static final String hbox ="\\\\hbox{";
+	static final String strut ="\\\\strut ";
 	final List<ExternalSchema> schema = new ArrayList<>();
 	final List<ControlledVocabulary> vocabs = new ArrayList<>();
 	static final Map<String, String> vocabLookup = new HashMap<>();
@@ -44,16 +46,20 @@ public final class SchemaAppendixGenerator {
 	public static String getVocabName(final String id) {
 		return SchemaAppendixGenerator.vocabLookup.get(id);
 	}
+	
+	static String pandocLink(final String link) {
+		return " {#" + link + "}";
+	}
 
 	public void generateAppendix(final Path projRoot) throws IOException {
 		OutputHandler handler = OutputHandler.toAppendix(projRoot, "schema"); //$NON-NLS-1$
-		handler.emit(MarkdownFormatter.h2("External Schema"));
+		handler.emit(GitHubMarkdownFormatter.h2("External Schema"));
 		handler.nl();
 		for (ExternalSchema scheme : this.schema) {
 			handler.nl();
-			handler.emit(MarkdownFormatter.h3(scheme.name));
+			handler.emit(GitHubMarkdownFormatter.h3(scheme.name));
 			handler.nl();
-			handler.emit(headString("Location:", MarkdownFormatter.href(scheme.url.toString(), scheme.url.toString())));
+			handler.emit(headString("Location:", GitHubMarkdownFormatter.href(scheme.url.toString(), scheme.url.toString())));
 			handler.nl();
 			handler.emit(headString("Context:", scheme.context));
 			handler.nl();
@@ -61,41 +67,78 @@ public final class SchemaAppendixGenerator {
 			handler.nl();
 			for (String para : scheme.note) {
 				handler.emit(para);
-				handler.emit(MarkdownFormatter.htmlBr);
+				handler.emit(GitHubMarkdownFormatter.htmlBr);
 				handler.nl();
 			}
 			handler.nl();
 		}
-		handler.emit(MarkdownFormatter.h2("Controlled Vocabularies"));
+		handler.emit(GitHubMarkdownFormatter.h2("Controlled Vocabularies"));
 		handler.nl();
 		for (ControlledVocabulary vocab : this.vocabs) {
 			handler.nl();
-			handler.emit(MarkdownFormatter.h3(vocab.name));
+			handler.emit(GitHubMarkdownFormatter.h3(vocab.name));
+//			handler.emit("  ");
+//			handler.emit(pandocLink(vocab.id));
 			handler.nl();
-			handler.emit(MarkdownFormatter.anchor(vocab.id));
+			handler.emit(GitHubMarkdownFormatter.anchor(vocab.id));
+			handler.nl();
 			handler.nl();
 			handler.emit(headString("Maintained By:", vocab.maintenanceAgency));
+			handler.emit("  ");
 			handler.nl();
-			handler.emit(headString("Location:", MarkdownFormatter.href(vocab.uri.toString(), vocab.uri.toString())));
+			handler.emit(headString("Location:", GitHubMarkdownFormatter.href(vocab.uri.toString(), vocab.uri.toString())));
 			handler.nl();
 			handler.emit(headString("Context:", vocab.context));
+			handler.emit("  ");
 			handler.nl();
 			handler.emit(headString("Description:", " "));
 			handler.nl();
 			for (String para : vocab.description) {
 				handler.emit(para);
-				handler.emit(MarkdownFormatter.htmlBr);
+				handler.emit("  ");
 				handler.nl();
 			}
+			handler.emit("  ");
 			handler.nl();
 		}
 	}
 
 	private static String headString(final String head, final String val) {
-		StringBuffer buff = new StringBuffer(MarkdownFormatter.makeBold(head));
+		StringBuffer buff = new StringBuffer(GitHubMarkdownFormatter.makeBold(head));
 		buff.append(" ");
 		buff.append(val);
-		buff.append(MarkdownFormatter.htmlBr);
+		buff.append("   \n");
 		return buff.toString();
+	}
+
+//	private static String pandocHeadString(final String head, final String val) {
+//		StringBuffer buff = new StringBuffer(GitHubMarkdownFormatter.makePandocBold(head));
+//		buff.append(" ");
+//		buff.append(val);
+//		return buff.toString();
+//	}
+	
+	private static String vtop(final String val) {
+		StringBuffer buff = new StringBuffer(vtop);
+		buff.append(val);
+		buff.append("}");
+		return buff.toString();
+	}
+	
+	private static String hbox(final String val) {
+		StringBuffer buff = new StringBuffer(hbox);
+		buff.append(val);
+		buff.append("}");
+		return buff.toString();
+	}
+	
+	private static String strut(final String val) {
+		StringBuffer buff = new StringBuffer(strut);
+		buff.append(val);
+		return buff.toString();
+	}
+	
+	private static String pandocTableLine(final String val) {
+		return vtop(hbox(strut(val)));
 	}
 }

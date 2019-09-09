@@ -1,5 +1,5 @@
 # Preface
-## I. Aim of the specification
+## I. Aim of the Specification
 This specification is one of several related specifications. The single most important aim of all of these specifications is the provision of a common set of specifications for packaging digital information for archiving purposes. The specifications are based on common, international standards for transmitting, describing and preserving digital data. They have been produced to help data creators, software developers and digital archives to tackle the challenge of short-, medium- and long-term data management and reuse in a sustainable, authentic, cost-efficient, manageable and interoperable way.
 
 The foundation upon which the specifications are built is the Reference model for an Open Archival Information System (OAIS) (OAIS Reference model) which has Information Packages as its basis. Familiarity with the core functional entities of OAIS is a prerequisite for understanding the specifications.
@@ -34,7 +34,7 @@ The main aims of this specification are to:
 - Recommend a set of metadata related to the structural and the preservation aspects of the AIP as implemented by the reference implementation (earkweb).
 - Ensure the format is suitable to store large quantities of data.
 
-#### Specifcation for Dissemination Information Packages (E-ARK DIP)
+#### Specification for Dissemination Information Packages (E-ARK DIP)
 The main aims of this specification are to:
 
 - Define a generic structure of the DIP format suitable for a wide variety of archival records, such as document and image collections, databases or geographical data.
@@ -46,8 +46,8 @@ The main aims of a Content Information Type Specification are to:
 - Define, in technical terms, how data and metadata must be formatted and placed within a CSIP Information Package in order to achieve interoperability in exchanging specific Content Information.
 - The number of possible Content Information Type Specifications is unlimited. For at list of existing Content Information Type Specifications see, and read more about  Content Information Type Specifications in the Common Specification for Information Packages.
 
-## II Organisational support
+## II. Organisational support
 This specification is maintained by the Digital Information LifeCycle Interoperability Standards Board (DILCIS Board, <http://dilcis.eu/>). The DILCIS Board was created to enhance and maintain the draft specifications developed in the European Archival Records and Knowledge Preservation Project (E-ARK project, <http://eark-project.com/>) which concluded in January 2017. The Board consists of eight members, but there is no restriction on the number of participants in the work. All Board documents and specifications are stored in GitHub (<https://github.com/DILCISBoard/>) while published versions are made available on the Board webpage. Since 2018 the DILCIS Board has been responsible for the core specifications in the Connecting Europe Facility eArchiving Building Block <https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/eArchiving/>.
 
-## III Authors & Revision History
+## III. Authors & Revision History
 A full list of contributors to this specification, as well as the revision history can be found in the [Postface material](#postface).

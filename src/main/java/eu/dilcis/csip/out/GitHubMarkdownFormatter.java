@@ -12,7 +12,7 @@ import java.util.List;
  *          Created 17 Nov 2018:16:17:30
  */
 
-enum MarkdownFormatter {
+enum GitHubMarkdownFormatter {
 	INSTANCE;
 	// Markdown Tags
 	private final static String empty = ""; //$NON-NLS-1$
@@ -39,6 +39,15 @@ enum MarkdownFormatter {
 		StringBuffer buff = new StringBuffer(mdBoldMarker);
 		buff.append(toBold);
 		buff.append(mdBoldMarker);
+		return buff.toString();
+	}
+
+	private static String makePandocBold(final String toBold) {
+		if (toBold == null || toBold.isEmpty())
+			return empty;
+		StringBuffer buff = new StringBuffer("\\\\textbf{");
+		buff.append(toBold);
+		buff.append("}");
 		return buff.toString();
 	}
 
@@ -122,11 +131,9 @@ enum MarkdownFormatter {
 	}
 	
 	static String href(final String href, final String textVal) {
-		StringBuffer buff = new StringBuffer(hrefEleStart); //$NON-NLS-1$
-		buff.append(href);
-		buff.append("\" >"); //$NON-NLS-1$
-		buff.append(textVal);
-		buff.append("</a>"); //$NON-NLS-1$
+		StringBuffer buff = new StringBuffer("["); //$NON-NLS-1$
+		buff.append(textVal + "](");
+		buff.append(href + ")");
 		return buff.toString();
 	}
 }
