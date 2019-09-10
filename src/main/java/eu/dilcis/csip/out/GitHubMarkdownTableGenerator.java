@@ -17,7 +17,7 @@ public class GitHubMarkdownTableGenerator implements RequirementTableGenerator {
 		return new GitHubMarkdownTableGenerator();
 	}
 
-	protected final static String[] tableHeadings = { " ID    ", "Name, Location & Description", "Card & Level" }; //$NON-NLS-1$ //$NON-NLS-2$
+	protected final static String[] tableHeadings = { "  ID  ", " Name, Location & Description   ", "Card & Level" }; //$NON-NLS-1$ //$NON-NLS-2$
 	protected final List<Requirement> requirements = new ArrayList<>();
 
 	@Override
@@ -51,14 +51,13 @@ public class GitHubMarkdownTableGenerator implements RequirementTableGenerator {
 		}
 	}
 
-	static void tableHeading(final OutputHandler outHandler)
-			throws IOException {
+	static void tableHeading(final OutputHandler outHandler) throws IOException {
 		boolean isFirst = true;
 		StringBuffer headingLines = new StringBuffer();
 		for (String heading : tableHeadings) {
 			outHandler.emit(GitHubMarkdownFormatter.cell(heading, isFirst));
-			headingLines.append(GitHubMarkdownFormatter.cell(
-					GitHubMarkdownFormatter.makeHeadingLines(heading), isFirst));
+			headingLines
+					.append(GitHubMarkdownFormatter.cell(GitHubMarkdownFormatter.makeHeadingLines(heading), isFirst));
 			isFirst = false;
 		}
 		outHandler.nl();
@@ -66,25 +65,46 @@ public class GitHubMarkdownTableGenerator implements RequirementTableGenerator {
 		outHandler.nl();
 	}
 
-	static void tableRow(OutputHandler outputHandler, final Requirement req)
-			throws IOException {
-		outputHandler.emit(GitHubMarkdownFormatter
-				.anchorCell(req.id.prefix + req.id.number, true));
+	static void tableRow(OutputHandler outputHandler, final Requirement req) throws IOException {
+		outputHandler.emit(GitHubMarkdownFormatter.anchorCell(req.id.prefix + req.id.number, true));
 		outputHandler.emit(GitHubMarkdownFormatter.cell(descCellText(req)));
 		outputHandler.emit(GitHubMarkdownFormatter.cell(cardString(req)));
 		outputHandler.nl();
 	}
 
 	static String descCellText(final Requirement req) {
-		
-		StringBuffer buff = new StringBuffer(nameString(req));
-		buff.append(GitHubMarkdownFormatter.htmlBr);
+		List<String> lines = new ArrayList<>();
+		lines.add(LatexFormatter.makePandocBold(req.name));
+		if (!req.xPath.trim().isEmpty()) {
+			lines.addAll(splitLoc(req.xPath));
+		}
+		StringBuffer buff = new StringBuffer(LatexFormatter.pandocTableLines(lines));
 		buff.append(GitHubMarkdownFormatter.concatDescription(req.description));
-		relatedMatter(buff, req.relatedMatter());
+		buff.append(relatedMatter(req.relatedMatter()));
 		return buff.toString();
 	}
+
+	static List<String> splitLoc(final String xpath) {
+		List<String> locLines = new ArrayList<>();
+		if (xpath.length() > 50) {
+			int splitPoint = xpath.lastIndexOf("[@") + 2;
+			if (splitPoint < 30) {
+				int altSplitPoint = xpath.lastIndexOf("/@") + 2;
+				splitPoint = (splitPoint > altSplitPoint) ? splitPoint : altSplitPoint;
+			}
+			locLines.add("\\small " + LatexFormatter.texttt(xpath.substring(0, splitPoint)));
+			locLines.add("\\small " + LatexFormatter.texttt(xpath.substring(splitPoint)));
+		} else {
+			locLines.add("\\small " + LatexFormatter.texttt(xpath));
+		}
+		return locLines;
+	}
+
 	static String cardString(final Requirement req) {
-		return boldHeadPair(req.cardinality, req.reqLevel);
+		List<String> lines = new ArrayList<>();
+		lines.add(LatexFormatter.makePandocBold(req.cardinality));
+		lines.add(req.reqLevel);
+		return LatexFormatter.pandocTableLines(lines);
 	}
 
 	static String nameString(final Requirement req) {
@@ -98,26 +118,20 @@ public class GitHubMarkdownTableGenerator implements RequirementTableGenerator {
 		return buff.toString();
 	}
 
-	static StringBuffer relatedMatter(StringBuffer buff, String[] ids) {
-		if (ids == null || ids.length == 0)
-			return buff;
+	static String relatedMatter(String[] ids) {
+		String prefix = LatexFormatter.makePandocBold("See also: ");
 		StringBuffer relMattBuff = new StringBuffer();
-		relMattBuff.append(GitHubMarkdownFormatter.htmlBr);
-		relMattBuff.append(GitHubMarkdownFormatter.makeBold("See also:")); //$NON-NLS-1$
-		relMattBuff.append(" ");
-		String prefix = relMattBuff.toString();
-		relMattBuff = new StringBuffer();
 		for (String id : ids) {
-			String vocabName =  SchemaAppendixGenerator.getVocabName(id);
+			String vocabName = SchemaAppendixGenerator.getVocabName(id);
 			if (vocabName != null) {
-				buff.append(prefix);
-				buff.append(GitHubMarkdownFormatter.href(relMattHref(id), vocabName));
+				relMattBuff.append(prefix);
+				relMattBuff.append(GitHubMarkdownFormatter.href(relMattHref(id), vocabName));
 				prefix = ", ";
 			}
 		}
-		return buff;
+		return relMattBuff.toString();
 	}
-	
+
 	private static String relMattHref(final String id) {
 		return "#" + id;
 	}

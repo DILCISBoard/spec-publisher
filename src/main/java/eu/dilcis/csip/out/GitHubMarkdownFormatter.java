@@ -30,7 +30,6 @@ enum GitHubMarkdownFormatter {
 	// HTML Tags
 	private final static String anchorOpen = "<a name=\""; //$NON-NLS-1$
 	private final static String anchorClose = "\"></a>"; //$NON-NLS-1$
-	private final static String hrefEleStart = " <a href=\""; //$NON-NLS-1$
 	final static String htmlBr = " <br/> "; //$NON-NLS-1$
 
 	static String makeBold(final String toBold) {
@@ -39,15 +38,6 @@ enum GitHubMarkdownFormatter {
 		StringBuffer buff = new StringBuffer(mdBoldMarker);
 		buff.append(toBold);
 		buff.append(mdBoldMarker);
-		return buff.toString();
-	}
-
-	private static String makePandocBold(final String toBold) {
-		if (toBold == null || toBold.isEmpty())
-			return empty;
-		StringBuffer buff = new StringBuffer("\\\\textbf{");
-		buff.append(toBold);
-		buff.append("}");
 		return buff.toString();
 	}
 
@@ -114,6 +104,8 @@ enum GitHubMarkdownFormatter {
 
 	static String makeHeadingLines(final String heading) {
 		int len = (heading == null || heading.isEmpty()) ? 1 : heading.length();
+		// TODO : Horrible hack to make the final column a reasonable width
+		len = (len == 12) ? 7 : len;
 		char[] chars = new char[len];
 		Arrays.fill(chars, hyphen);
 		return new String(chars);

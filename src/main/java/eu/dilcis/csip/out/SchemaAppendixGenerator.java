@@ -20,9 +20,6 @@ import eu.dilcis.csip.profile.ExternalSchema;
  */
 
 public final class SchemaAppendixGenerator {
-	static final String vtop ="\\\\vtop{";
-	static final String hbox ="\\\\hbox{";
-	static final String strut ="\\\\strut ";
 	final List<ExternalSchema> schema = new ArrayList<>();
 	final List<ControlledVocabulary> vocabs = new ArrayList<>();
 	static final Map<String, String> vocabLookup = new HashMap<>();
@@ -77,8 +74,8 @@ public final class SchemaAppendixGenerator {
 		for (ControlledVocabulary vocab : this.vocabs) {
 			handler.nl();
 			handler.emit(GitHubMarkdownFormatter.h3(vocab.name));
-//			handler.emit("  ");
-//			handler.emit(pandocLink(vocab.id));
+			handler.emit("  ");
+			handler.emit(pandocLink(vocab.id));
 			handler.nl();
 			handler.emit(GitHubMarkdownFormatter.anchor(vocab.id));
 			handler.nl();
@@ -111,34 +108,4 @@ public final class SchemaAppendixGenerator {
 		return buff.toString();
 	}
 
-//	private static String pandocHeadString(final String head, final String val) {
-//		StringBuffer buff = new StringBuffer(GitHubMarkdownFormatter.makePandocBold(head));
-//		buff.append(" ");
-//		buff.append(val);
-//		return buff.toString();
-//	}
-	
-	private static String vtop(final String val) {
-		StringBuffer buff = new StringBuffer(vtop);
-		buff.append(val);
-		buff.append("}");
-		return buff.toString();
-	}
-	
-	private static String hbox(final String val) {
-		StringBuffer buff = new StringBuffer(hbox);
-		buff.append(val);
-		buff.append("}");
-		return buff.toString();
-	}
-	
-	private static String strut(final String val) {
-		StringBuffer buff = new StringBuffer(strut);
-		buff.append(val);
-		return buff.toString();
-	}
-	
-	private static String pandocTableLine(final String val) {
-		return vtop(hbox(strut(val)));
-	}
 }
