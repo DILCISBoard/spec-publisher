@@ -92,10 +92,10 @@ public class GitHubMarkdownTableGenerator implements RequirementTableGenerator {
 				int altSplitPoint = xpath.lastIndexOf("/@") + 2;
 				splitPoint = (splitPoint > altSplitPoint) ? splitPoint : altSplitPoint;
 			}
-			locLines.add("\\small " + LatexFormatter.texttt(xpath.substring(0, splitPoint)));
-			locLines.add("\\small " + LatexFormatter.texttt(xpath.substring(splitPoint)));
+			locLines.add(LatexFormatter.small(LatexFormatter.texttt(xpath.substring(0, splitPoint))));
+			locLines.add(LatexFormatter.small(LatexFormatter.texttt(xpath.substring(splitPoint))));
 		} else {
-			locLines.add("\\small " + LatexFormatter.texttt(xpath));
+			locLines.add(LatexFormatter.small(LatexFormatter.texttt(xpath)));
 		}
 		return locLines;
 	}

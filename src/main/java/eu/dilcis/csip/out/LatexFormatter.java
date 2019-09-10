@@ -20,6 +20,7 @@ enum LatexFormatter {
 	private static final String strut = "\\strut ";
 	private static final String textbf = "\\textbf";
 	private static final String texttt = "\\texttt";
+	private static final String small = "\\small ";
 
 	static String texttt(final String val) {
 		StringBuffer buff = new StringBuffer(texttt);
@@ -35,6 +36,12 @@ enum LatexFormatter {
 
 	private static String strut(final String val) {
 		StringBuffer buff = new StringBuffer(strut);
+		buff.append(val);
+		return buff.toString();
+	}
+
+	static String small(final String val) {
+		StringBuffer buff = new StringBuffer(small);
 		buff.append(val);
 		return buff.toString();
 	}
