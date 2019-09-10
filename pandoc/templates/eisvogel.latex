@@ -680,6 +680,15 @@ $endif$
 %% end added
 %%
 
+%
+% Commands to disable and enable section writing to table of contents
+% Taken from https://tex.stackexchange.com/questions/214131/exclude-appendix-sections-subsections-and-subsubsection-from-toc
+%
+\newcommand{\stoptocwriting}{%
+  \addtocontents{toc}{\protect\setcounter{tocdepth}{-5}}}
+\newcommand{\resumetocwriting}{%
+  \addtocontents{toc}{\protect\setcounter{tocdepth}{\arabic{tocdepth}}}}
+
 \begin{document}
 
 %%
@@ -743,8 +752,12 @@ $abstract$
 $endif$
 $endif$
 
+% Disable TOC writing for include-befores
+\stoptocwriting
 $for(include-before)$
 $include-before$
+% Resume TOC writing
+\resumetocwriting
 
 $endfor$
 $if(toc)$
@@ -814,8 +827,12 @@ $else$
 $endif$
 
 $endif$
+% Disable TOC writing for include-afters
+\stoptocwriting
 $for(include-after)$
 $include-after$
+% Resume writing TOC
+\resumetocwriting
 
 $endfor$
 \end{document}
