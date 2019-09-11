@@ -53,7 +53,6 @@ public final class SchemaAppendixGenerator {
 
 	public void generateAppendix(final Path projRoot) throws IOException {
 		OutputHandler handler = OutputHandler.toAppendix(projRoot, "schema"); //$NON-NLS-1$
-		handler.emit(GitHubMarkdownFormatter.h2("External Schema"));
 		handler.nl();
 		for (ExternalSchema scheme : this.schema) {
 			handler.nl();
@@ -72,8 +71,7 @@ public final class SchemaAppendixGenerator {
 			}
 			handler.nl();
 		}
-		handler.emit(GitHubMarkdownFormatter.h2("Controlled Vocabularies"));
-		handler.nl();
+		handler = OutputHandler.toAppendix(projRoot, "vocabs"); //$NON-NLS-1$
 		for (ControlledVocabulary vocab : this.vocabs) {
 			handler.nl();
 			handler.emit(GitHubMarkdownFormatter.h3(vocab.name));
