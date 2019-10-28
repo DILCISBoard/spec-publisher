@@ -14,6 +14,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.helpers.NamespaceSupport;
 
 import eu.dilcis.csip.ProcessorOptions;
 import eu.dilcis.csip.out.ExampleGenerator;
@@ -86,7 +87,9 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
 	private int reqCounter = 0;
 	private String currDefTerm = null;
 	private Section currentSect;
-	private final Path projRoot;
+	private NamespaceSupport namespaces = new NamespaceSupport();
+    private boolean needNewContext = true;
+    private final Path projRoot;
 
 	private final Map<Section, Set<String>> exampleMap = new HashMap<>();
 	private final Map<Section, ExampleGenerator> exampleHandlers = new HashMap<>();
@@ -112,9 +115,26 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
 	}
 
 	@Override
+	public void startPrefixMapping(String prefix, String uri) throws SAXException {
+		if (needNewContext) {
+			namespaces.pushContext();
+			needNewContext = false;
+		}
+		namespaces.declarePrefix(prefix, uri);
+	}
+
+	@Override
+	public void endPrefixMapping(String prefix) throws SAXException {
+		// add additional endElement() code...
+		namespaces.popContext();
+	}
+
+	@Override
 	public void startElement(String namespaceURI, String sName, // simple name
 			String qName, // qualified name
 			Attributes attrs) throws SAXException {
+	    if (needNewContext) namespaces.pushContext();
+	    needNewContext = true;
 		// Get the current ele name
 		this.currEleName = qName;
 		if (Requirement.isRequirementEle(this.currEleName)) {
@@ -127,11 +147,11 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
 			this.startExample(attrs);
 		} else if (this.inExample) {
 			this.fragStart(this.getSectionExampleHandler(this.currentSect),
-					attrs);
+					attrs, this.namespaces);
 		} else if (appendixEle.equals(this.currEleName)) {
 			this.startAppendix(attrs);
 		} else if (this.inAppendix) {
-			this.fragStart(this.appendixGenerator, attrs);
+			this.fragStart(this.appendixGenerator, attrs, this.namespaces);
 		} else if (extSchemaEle.equals(this.currEleName)) {
 			this.inExtSchema = true;
 			this.schemaBuilder = new ExternalSchema.Builder();
@@ -400,10 +420,10 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
 		return empty;
 	}
 
-	private void fragStart(ExampleGenerator generator, final Attributes attrs)
+	private void fragStart(ExampleGenerator generator, final Attributes attrs, final NamespaceSupport namespaces)
 			throws SAXException {
 		try {
-			generator.outputEleStart(this.currEleName, attrs);
+			generator.outputEleStart(this.currEleName, attrs, namespaces);
 		} catch (IOException excep) {
 			throw new SAXException(ioExcepMess, excep);
 		}
