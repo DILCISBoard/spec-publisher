@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import org.xml.sax.Attributes;
+import org.xml.sax.helpers.NamespaceSupport;
 
 /**
  * Abstract class to handle the pain of XML element generation, e.g.
@@ -57,11 +58,11 @@ abstract class XmlFragmentGenerator {
 		this.indent = indent;
 	}
 
-	public void outputEleStart(final String eleName, final Attributes attrs)
+	public void outputEleStart(final String eleName, final Attributes attrs, final NamespaceSupport namespaces)
 			throws IOException {
 		this.handler.nl();
 		this.indent();
-		this.handler.emit(XmlFormatter.eleStartTag(eleName, attrs));
+		this.handler.emit(XmlFormatter.eleStartTag(eleName, attrs, namespaces));
 		this.indent++;
 	}
 
