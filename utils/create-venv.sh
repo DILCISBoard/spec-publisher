@@ -9,7 +9,7 @@ command -v markdown-pp >/dev/null 2>&1 || {
   if [ ! -d "$tmpdir/.venv-markdown/" ]
   then
     # IF no virtualenv exists
-    virtualenv -p python3 "$tmpdir/.venv-markdown"
+    virtualenv -p python "$tmpdir/.venv-markdown"
     source "$tmpdir/.venv-markdown/bin/activate"
     pip install markdownPP
   fi
