@@ -5,11 +5,12 @@ command -v markdown-pp >/dev/null 2>&1 || {
   # IF no markdown-pp command
   # Grab the temp directory name
   # Acknowledgements to https://unix.stackexchange.com/questions/174817/finding-the-correct-tmp-dir-on-multiple-platforms
-  tmpdir=$(dirname $(mktemp -u))
+  tmpdir=$(dirname "$(mktemp -u)")
   if [ ! -d "$tmpdir/.venv-markdown/" ]
   then
     # IF no virtualenv exists
     virtualenv -p python "$tmpdir/.venv-markdown"
+    # shellcheck source=/tmp/.venv-markdown/bin/activate
     source "$tmpdir/.venv-markdown/bin/activate"
     pip install markdownPP
   fi
