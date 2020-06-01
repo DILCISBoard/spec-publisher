@@ -24,7 +24,7 @@ Ultimately the goal of the Common Specification is to reach a level of interoper
 #### Specification for Submission Information Packages (E-ARK SIP)
 The main aims of this specification are to:
 
-- Define a general structure for a Submission Information Package format suitable for a wide variety of archival scenarios, such as document and image collections, databases or geographical data.
+- Define a general structure for a Submission Information Package format suitable for a wide variety of archival scenarios, such as document and image collections, databases or geospatial data.
 - Enhance interoperability between Producers and Archives.
 - Recommend best practices regarding the structure, content and metadata of Submission Information Packages.
 
@@ -48,7 +48,7 @@ The main aim of a Content Information Type Specification (CITS) is to:
 
 The number of possible Content Information Type Specifications is unlimited. For a list of existing Content Information Type Specifications see the relevant section in the Common Specification for Information Packages.
 
-## II. Organisational support
+## II. Organisational Support
 This specification is maintained by the Digital Information LifeCycle Interoperability Standards Board (DILCIS Board, <http://dilcis.eu/>). The role of the DILCIS Board is to enhance and maintain the draft specifications developed in the European Archival Records and Knowledge Preservation Project (E-ARK project, <http://eark-project.com/>) which concluded in January 2017. The Board consists of eight members, but no restriction is placed on the number of participants taking part in the work. All Board documents and specifications are stored in GitHub (<https://github.com/DILCISBoard/>) while published versions are made available on the Board webpage. Since 2018 the DILCIS Board has been responsible for the core specifications in the Connecting Europe Facility eArchiving Building Block <https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/eArchiving/>.
 
 ## III. Authors & Revision History
