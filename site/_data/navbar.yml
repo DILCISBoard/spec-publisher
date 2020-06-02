@@ -1,0 +1,24 @@
+- title: "Specification"
+  href: "/"
+
+- title: "PDF"
+  href: "/pdf/eark-csip.pdf"
+
+- title: "Profile"
+  href: "/profile/"
+
+- title: "Archive"
+  href: "/archive/"
+
+- title: "Examples"
+  href: "/examples/"
+
+- title: "About"
+  href: "/about/"
+  subcategories:
+    - subtitle: "DILCIS"
+      subextref: "https://dilcis.eu/software/"
+    - subtitle: "On GitHub"
+      subextref: "https://github.com/DILCISBoard/E-ARK-CSIP"
+    - subtitle: "Download"
+      subextref: "https://github.com/DILCISBoard/E-ARK-CSIP/archive/master.zip"

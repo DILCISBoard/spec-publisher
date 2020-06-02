@@ -3,7 +3,7 @@ E-ARK CSIP METS Profile Processor
 
 Java SAX based XML processor for the CSIP METS Profile. Performs the following tasks:
 - [x] schema aware parsing and validation of the METS profile;
-- [ ] generation of metadata requirements tables from Profile requirements;
+- [x] generation of metadata requirements tables from Profile requirements;
 - [ ] checks for duplicate requirement ID allocation; and
 - [ ] reports gaps in the ID sequence (in preparation for deprecation reporting).
 
