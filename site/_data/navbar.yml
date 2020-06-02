@@ -14,7 +14,7 @@
   href: "/examples/"
 
 - title: "About"
-  href: "/about/"
+  href: "/"
   subcategories:
     - subtitle: "DILCIS"
       subextref: "https://dilcis.eu/software/"
