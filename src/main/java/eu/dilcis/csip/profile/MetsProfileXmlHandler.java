@@ -90,6 +90,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
 	private NamespaceSupport namespaces = new NamespaceSupport();
     private boolean needNewContext = true;
     private final Path projRoot;
+    private String currentHref = null;
 
 	private final Map<Section, Set<String>> exampleMap = new HashMap<>();
 	private final Map<Section, ExampleGenerator> exampleHandlers = new HashMap<>();
@@ -140,7 +141,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
 		if (Requirement.isRequirementEle(this.currEleName)) {
 			this.processRequirementAttrs(attrs);
 		} else if (this.inRequirement) {
-			this.processRequirementChildStart();
+			this.processRequirementChildStart(attrs);
 		} else if (Section.isSection(this.currEleName)) {
 			this.startSection();
 		} else if (exampleEle.equals(this.currEleName)) {
@@ -255,14 +256,26 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
 		this.reqBuilder = new Requirement.Builder();
 	}
 
-	private void processRequirementChildStart() {
+	private void processRequirementChildStart(Attributes eleAtts) {
 		switch (this.currEleName) {
 		case anchorEle:
-			this.reqBuilder.description(this.charBuff.getBufferValue());
+			this.reqBuilder.descPart(this.charBuff.getBufferValue());
+			this.currentHref = this.getHref(eleAtts);
 			break;
 		default:
 			break;
 		}
+	}
+
+	private String getHref(Attributes attrs) {
+		if (attrs == null)
+			return null;
+		for (int i = 0; i < attrs.getLength(); i++) {
+			String aName = attrs.getLocalName(i); // Attr name
+			if ("href".equals(aName))
+				return attrs.getValue(i);
+		}
+		return null;
 	}
 
 	private void processRequirementChild() {
@@ -281,7 +294,8 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
 			this.reqBuilder.description(this.charBuff.getBufferValue());
 			break;
 		case anchorEle:
-			this.reqBuilder.description(this.charBuff.getBufferValue());
+			String buffVal = this.charBuff.getBufferValue();
+			this.reqBuilder.descPart(" [" + buffVal + "](" + this.currentHref + ") ");
 			break;
 		default:
 			break;

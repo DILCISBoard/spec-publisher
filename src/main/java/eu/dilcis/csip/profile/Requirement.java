@@ -171,16 +171,17 @@ public class Requirement {
 		private List<String> examples;
 		private String xPath;
 		private String cardinality;
+		private String descParts = "";
 
 		public Builder() {
 			this(Requirement.DEFAULT);
 		}
 
-		public Builder(Requirement.Builder builder) {
+		public Builder(final Requirement.Builder builder) {
 			this(builder.build());
 		}
 
-		public Builder(Requirement req) {
+		public Builder(final Requirement req) {
 			super();
 			this.id = req.id;
 			this.name = req.name;
@@ -223,7 +224,7 @@ public class Requirement {
 		 * @param id
 		 *            the id to set
 		 */
-		public Requirement.Builder id(Requirement.RequirementId iD) {
+		public Requirement.Builder id(final Requirement.RequirementId iD) {
 			this.id = iD;
 			return this;
 		}
@@ -232,7 +233,7 @@ public class Requirement {
 		 * @param name
 		 *            the name to set
 		 */
-		public Requirement.Builder name(String nm) {
+		public Requirement.Builder name(final String nm) {
 			this.name = nm;
 			return this;
 		}
@@ -241,7 +242,7 @@ public class Requirement {
 		 * @param reqLevel
 		 *            the reqLevel to set
 		 */
-		public Requirement.Builder relMat(String rlMt) {
+		public Requirement.Builder relMat(final String rlMt) {
 			this.relMat = rlMt;
 			return this;
 		}
@@ -250,19 +251,13 @@ public class Requirement {
 		 * @param reqLevel
 		 *            the reqLevel to set
 		 */
-		public Requirement.Builder reqLevel(String rqLvl) {
+		public Requirement.Builder reqLevel(final String rqLvl) {
 			this.reqLevel = rqLvl;
 			return this;
 		}
 
-		/**
-		 * @param description
-		 *            the description to set
-		 */
-		public Requirement.Builder description(String dscrptn) {
-			if (dscrptn == null || dscrptn.isEmpty())
-				return this;
-			this.description.add(dscrptn);
+		public Requirement.Builder descPart(final String part) {
+			this.descParts += part;
 			return this;
 		}
 
@@ -270,7 +265,19 @@ public class Requirement {
 		 * @param description
 		 *            the description to set
 		 */
-		public Requirement.Builder descriptions(List<String> dscrptns) {
+		public Requirement.Builder description(final String dscrptn) {
+			if (dscrptn == null || dscrptn.isEmpty())
+				return this;
+			this.description.add(this.descParts + dscrptn);
+			this.descParts = "";
+			return this;
+		}
+
+		/**
+		 * @param description
+		 *            the description to set
+		 */
+		public Requirement.Builder descriptions(final List<String> dscrptns) {
 			this.description = new ArrayList<>(dscrptns);
 			return this;
 		}
@@ -279,7 +286,7 @@ public class Requirement {
 		 * @param examples
 		 *            the examples to set
 		 */
-		public Requirement.Builder examples(List<String> xmpls) {
+		public Requirement.Builder examples(final List<String> xmpls) {
 			this.examples = new ArrayList<>(xmpls);
 			return this;
 		}
@@ -288,7 +295,7 @@ public class Requirement {
 		 * @param example
 		 *            the example to add
 		 */
-		public Requirement.Builder example(String xmpl) {
+		public Requirement.Builder example(final String xmpl) {
 			this.examples.add(xmpl);
 			return this;
 		}
@@ -297,7 +304,7 @@ public class Requirement {
 		 * @param xPath
 		 *            the xPath to set
 		 */
-		public Requirement.Builder defPair(String term, final String def) {
+		public Requirement.Builder defPair(final String term, final String def) {
 			switch (term) {
 			case Requirement.xPathTerm:
 				return this.xPath(def);
@@ -313,7 +320,7 @@ public class Requirement {
 		 * @param xPath
 		 *            the xPath to set
 		 */
-		public Requirement.Builder xPath(String xPth) {
+		public Requirement.Builder xPath(final String xPth) {
 			this.xPath = xPth;
 			return this;
 		}
@@ -322,7 +329,7 @@ public class Requirement {
 		 * @param cardinality
 		 *            the cardinality to set
 		 */
-		public Requirement.Builder cardinality(String crdnlty) {
+		public Requirement.Builder cardinality(final String crdnlty) {
 			this.cardinality = crdnlty;
 			return this;
 		}
@@ -361,7 +368,7 @@ public class Requirement {
 		}
 
 		@Override
-		public int compareTo(RequirementId other) {
+		public int compareTo(final RequirementId other) {
 			if (other.prefix.equals(this.prefix)) {
 				return (this.number < other.number) ? -1
 						: (this.number == other.number) ? 0 : -1;
