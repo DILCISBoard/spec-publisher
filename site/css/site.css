@@ -41,6 +41,7 @@ a.nav-link {
   position: relative;
   display: block;
   line-height: 40px;
+  font-size: 14px;
 }
 
 li.active {
