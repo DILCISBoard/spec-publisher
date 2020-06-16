@@ -335,6 +335,9 @@ public class Requirement {
 		}
 
 		public Requirement build() {
+			if (this.descParts.length() > 0) {
+				this.description.add(this.descParts);
+			}
 			return new Requirement(this.id, this.name, this.reqLevel,
 					this.relMat, this.description, this.examples, this.xPath,
 					this.cardinality);
