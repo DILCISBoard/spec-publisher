@@ -136,3 +136,7 @@ section.copyright {
 .container table tr:nth-child(2n) {
     background-color: #f6f8fa;
 }
+
+td code.highlighter-rouge {
+  colour: #d60766;
+}
