@@ -16,6 +16,8 @@
 - title: "About"
   href: "/"
   subcategories:
+    - subtitle: "Release Notes"
+      subextref: "/release-notes/"
     - subtitle: "DILCIS"
       subextref: "https://dilcis.eu/"
     - subtitle: "On GitHub"
