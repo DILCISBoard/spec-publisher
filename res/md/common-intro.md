@@ -8,7 +8,7 @@ A visualisation of the current specification network can be seen here:
 <a name="figi-dip"></a>
 ![OAIS Entities](figs/fig_1_dip.png "Diagram showing E-ARK specification dependency hierarchy")
 
-**Figure I:** Diagram showing E-ARK specification dependency hierarchy.
+**Figure I:** Diagram showing E-ARK specification dependency hierarchy. Note that the image only shows a selection of the published CITS and isn't an exhaustive list.
 
 ### Overview of the E-ARK Specifications
 
@@ -46,7 +46,7 @@ The main aim of a Content Information Type Specification (CITS) is to:
 
 - Define, in technical terms, how data and metadata must be formatted and placed within a CSIP Information Package to achieve interoperability in exchanging specific Content Information.
 
-The number of possible Content Information Type Specifications is unlimited. For a list of existing Content Information Type Specifications see the relevant section in the Common Specification for Information Packages.
+The number of possible Content Information Type Specifications is unlimited. For a list of existing Content Information Type Specifications see the DILCIS Board webpage (DILCIS Board, <http://dilcis.eu/>).
 
 ## II. Organisational Support
 This specification is maintained by the Digital Information LifeCycle Interoperability Standards Board (DILCIS Board, <http://dilcis.eu/>). The role of the DILCIS Board is to enhance and maintain the draft specifications developed in the European Archival Records and Knowledge Preservation Project (E-ARK project, <http://eark-project.com/>) which concluded in January 2017. The Board consists of eight members, but no restriction is placed on the number of participants taking part in the work. All Board documents and specifications are stored in GitHub (<https://github.com/DILCISBoard/>) while published versions are made available on the Board webpage. Since 2018 the DILCIS Board has been responsible for the core specifications in the Connecting Europe Facility eArchiving Building Block <https://ec.europa.eu/cefdigital/wiki/display/CEFDIGITAL/eArchiving/>.
