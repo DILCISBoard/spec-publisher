@@ -32,7 +32,7 @@ The main aims of this specification are to:
 The main aims of this specification are to:
 
 - Define a generic structure of the AIP format suitable for a wide variety of data types, such as document and image collections, archival records, databases or geospatial data.
-- Recommend a set of metadata related to the structural and the preservation aspects of the AIP as implemented by the reference implementation (earkweb).
+- Recommend a set of metadata related to the structural and the preservation aspects of the AIP as implemented by the eArchiving Reference Implementation (earkweb).
 - Ensure the format is suitable to store large quantities of data.
 
 #### Specification for Dissemination Information Packages (E-ARK DIP)
