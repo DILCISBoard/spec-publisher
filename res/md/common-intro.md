@@ -6,7 +6,7 @@ The specifications are designed to help data creators, software developers, and 
 A visualisation of the current specification network can be seen here:
 
 <a name="figi-dip"></a>
-![OAIS Entities](figs/fig_1_dip.svg "Diagram showing E-ARK specification dependency hierarchy")
+![OAIS Entities](figs/fig_1_dip.png "Diagram showing E-ARK specification dependency hierarchy")
 
 **Figure I:** Diagram showing E-ARK specification dependency hierarchy. Note that the image only shows a selection of the published CITS and isn't an exhaustive list.
 
