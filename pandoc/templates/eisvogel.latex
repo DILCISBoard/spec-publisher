@@ -51,6 +51,9 @@ $if(background-image)$
 \includegraphics[width=\paperwidth]{$background-image$}%
 }
 $endif$
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{makecell}
 \usepackage{pgfpages}
 \setbeamertemplate{caption}[numbered]
 \setbeamertemplate{caption label separator}{: }
