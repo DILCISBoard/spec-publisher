@@ -3,7 +3,6 @@ package eu.dilcis.csip;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
-import java.security.AccessControlException;
 
 /**
  * Parse and validate the command line arg array to a sensible options object.
@@ -17,15 +16,15 @@ import java.security.AccessControlException;
  */
 
 public final class ProcessorOptions {
-	final static String dirNotWritable = "Output directory: %s is not writeable."; //$NON-NLS-1$
+	static final String dirNotWritable = "Output directory: %s is not writeable."; //$NON-NLS-1$
 	// private final static String dirNotFoundMess = "Could not find output directory: %s."; //$NON-NLS-1$
 	// private final static String dirIsFileMess = "Output path %s must be a directory."; //$NON-NLS-1$
-	final static String fileNotFoundMess = "Could not find Profile file: %s."; //$NON-NLS-1$
-	final static String noFileArgMess = "No [FILE] argument passed to processor."; //$NON-NLS-1$
-	final static String fileisDirMess = "Profile path %s must be a file not a directory."; //$NON-NLS-1$
-	final static String usageOpt = "-h"; //$NON-NLS-1$
-	final static String outputOpt = "-o"; //$NON-NLS-1$
-	final static String period = "."; //$NON-NLS-1$
+	static final String fileNotFoundMess = "Could not find Profile file: %s."; //$NON-NLS-1$
+	static final String noFileArgMess = "No [FILE] argument passed to processor."; //$NON-NLS-1$
+	static final String fileisDirMess = "Profile path %s must be a file not a directory."; //$NON-NLS-1$
+	static final String usageOpt = "-h"; //$NON-NLS-1$
+	static final String outputOpt = "-o"; //$NON-NLS-1$
+	static final String period = "."; //$NON-NLS-1$
 	public final Path outDir;
 	public final boolean isUsage;
 	public final Path profileFile;
@@ -36,9 +35,12 @@ public final class ProcessorOptions {
 	private ProcessorOptions(final boolean isToCurrentDir,
 			final boolean isUsage, final Path profileFile) {
 		super();
+        if (profileFile == null) {
+            throw new IllegalArgumentException(String.format(noFileArgMess, "null"));
+        }
 		this.outDir = (isToCurrentDir) ? new File(period).toPath() : null;
 		if (this.outDir != null && !this.outDir.toFile().canWrite()) {
-			throw new AccessControlException(String.format(dirNotWritable,
+			throw new IllegalArgumentException(String.format(dirNotWritable,
 					this.outDir.toAbsolutePath().toString()));
 		}
 		this.isUsage = isUsage;
@@ -59,7 +61,7 @@ public final class ProcessorOptions {
 	 *         arguments
 	 * @throws FileNotFoundException
 	 */
-	final static ProcessorOptions fromArgs(final String[] args)
+	static final ProcessorOptions fromArgs(final String[] args)
 			throws FileNotFoundException {
 		// Path outDir = null; // Hold the output directory path, if any
 		boolean isToCurrentDir = false; // Flag when output directory requested
