@@ -15,8 +15,8 @@ import java.util.List;
  */
 
 public final class ControlledVocabulary {
-	final static String empty = ""; //$NON-NLS-1$
-	final static String defaultUriVal = "http://example.com"; //$NON-NLS-1$
+	static final String EMPTY = ""; //$NON-NLS-1$
+	static final String DEFAULT_URI = "http://example.com"; //$NON-NLS-1$
 
 	public final String id;
 	public final String name;
@@ -37,11 +37,11 @@ public final class ControlledVocabulary {
 	}
 
 	public static class Builder {
-		private String ident = empty;
-		private String nm = empty;
-		private String mntnceAgncy = empty;
-		private URI ri = URI.create(defaultUriVal);
-		private String cntxt = empty;
+		private String ident = EMPTY;
+		private String nm = EMPTY;
+		private String mntnceAgncy = EMPTY;
+		private URI ri = URI.create(DEFAULT_URI);
+		private String cntxt = EMPTY;
 		private List<String> desc = new ArrayList<>();
 
 		public Builder() {

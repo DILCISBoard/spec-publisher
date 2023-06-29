@@ -13,128 +13,128 @@ import java.util.List;
  */
 
 enum GitHubMarkdownFormatter {
-	INSTANCE;
-	// Markdown Tags
-	private final static String empty = ""; //$NON-NLS-1$
-	private final static String space = " "; //$NON-NLS-1$
-	private final static String cellDiv = "|"; //$NON-NLS-1$
-	private final static String cellDivCls = space + cellDiv; // $NON-NLS-1$
-	private final static String cellDivOpen = cellDiv + space; // $NON-NLS-1$
-	private final static char hyphen = '-';
-	private final static String mdBoldMarker = "**"; //$NON-NLS-1$
-	private final static String mdConsoleMarker = "`"; //$NON-NLS-1$
-	final static String mdInlineMarker = "```"; //$NON-NLS-1$
-	private final static String xml = "xml"; //$NON-NLS-1$
-	final static String mdInlineXml = mdInlineMarker + xml;
+    INSTANCE;
 
-	// HTML Tags
-	private final static String anchorOpen = "<a name=\""; //$NON-NLS-1$
-	private final static String anchorClose = "\"></a>"; //$NON-NLS-1$
-	private final static String hrefEleStart = " <a href=\""; //$NON-NLS-1$
-	final static String htmlBr = " <br/> "; //$NON-NLS-1$
+    // Markdown Tags
+    private static final String EMPTY = ""; //$NON-NLS-1$
+    private static final String SPACE = " "; //$NON-NLS-1$
+    private static final String cellDiv = "|"; //$NON-NLS-1$
+    private static final String cellDivCls = SPACE + cellDiv; // $NON-NLS-1$
+    private static final String cellDivOpen = cellDiv + SPACE; // $NON-NLS-1$
+    private static final char hyphen = '-';
+    private static final String mdBoldMarker = "**"; //$NON-NLS-1$
+    private static final String mdConsoleMarker = "`"; //$NON-NLS-1$
+    static final String mdInlineMarker = "```"; //$NON-NLS-1$
+    private static final String XML = "xml"; //$NON-NLS-1$
+    static final String mdInlineXml = mdInlineMarker + XML;
 
-	static String makeBold(final String toBold) {
-		if (toBold == null || toBold.isEmpty())
-			return empty;
-		StringBuffer buff = new StringBuffer(mdBoldMarker);
-		buff.append(toBold);
-		buff.append(mdBoldMarker);
-		return buff.toString();
-	}
+    // HTML Tags
+    private static final String anchorOpen = "<a name=\""; //$NON-NLS-1$
+    private static final String anchorClose = "\"></a>"; //$NON-NLS-1$
+    private static final String hrefEleStart = " <a href=\""; //$NON-NLS-1$
+    static final String htmlBr = " <br/> "; //$NON-NLS-1$
 
-	private static String makePandocBold(final String toBold) {
-		if (toBold == null || toBold.isEmpty())
-			return empty;
-		StringBuffer buff = new StringBuffer("\\\\textbf{");
-		buff.append(toBold);
-		buff.append("}");
-		return buff.toString();
-	}
+    static String makeBold(final String toBold) {
+        if (toBold == null || toBold.isEmpty())
+            return EMPTY;
+        StringBuilder buff = new StringBuilder(mdBoldMarker);
+        buff.append(toBold);
+        buff.append(mdBoldMarker);
+        return buff.toString();
+    }
 
-	static String makeConsole(final String toConsole) {
-		if (toConsole == null || toConsole.isEmpty())
-			return empty;
-		StringBuffer buff = new StringBuffer(mdConsoleMarker);
-		buff.append(toConsole);
-		buff.append(mdConsoleMarker);
-		return buff.toString();
-	}
+    private static String makePandocBold(final String toBold) {
+        if (toBold == null || toBold.isEmpty())
+            return EMPTY;
+        StringBuilder buff = new StringBuilder("\\\\textbf{");
+        buff.append(toBold);
+        buff.append("}");
+        return buff.toString();
+    }
 
-	static String anchorCell(final String cellVal) {
-		return anchorCell(cellVal, false);
-	}
+    static String makeConsole(final String toConsole) {
+        if (toConsole == null || toConsole.isEmpty())
+            return EMPTY;
+        StringBuilder buff = new StringBuilder(mdConsoleMarker);
+        buff.append(toConsole);
+        buff.append(mdConsoleMarker);
+        return buff.toString();
+    }
 
-	static String anchorCell(final String cellVal, final boolean isFirst) {
-		StringBuffer buff = new StringBuffer(anchor(cellVal));
-		buff.append(makeBold(cellVal));
-		return cell(buff.toString(), isFirst);
-	}
+    static String anchorCell(final String cellVal) {
+        return anchorCell(cellVal, false);
+    }
 
-	static String anchor(final String val) {
-		StringBuffer buff = new StringBuffer(anchorOpen);
-		buff.append(val);
-		buff.append(anchorClose);
-		return buff.toString();
-	}
+    static String anchorCell(final String cellVal, final boolean isFirst) {
+        StringBuilder buff = new StringBuilder(anchor(cellVal));
+        buff.append(makeBold(cellVal));
+        return cell(buff.toString(), isFirst);
+    }
 
-	static String h1(final String heading) {
-		StringBuffer buff = new StringBuffer("# ");
-		buff.append(heading);
-		return buff.toString();
-	}
+    static String anchor(final String val) {
+        StringBuilder buff = new StringBuilder(anchorOpen);
+        buff.append(val);
+        buff.append(anchorClose);
+        return buff.toString();
+    }
 
-	static String h2(final String heading) {
-		StringBuffer buff = new StringBuffer("## ");
-		buff.append(heading);
-		return buff.toString();
-	}
+    static String h1(final String heading) {
+        StringBuilder buff = new StringBuilder("# ");
+        buff.append(heading);
+        return buff.toString();
+    }
 
-	static String h3(final String heading) {
-		StringBuffer buff = new StringBuffer("### ");
-		buff.append(heading);
-		return buff.toString();
-	}
+    static String h2(final String heading) {
+        StringBuilder buff = new StringBuilder("## ");
+        buff.append(heading);
+        return buff.toString();
+    }
 
-	static String h4(final String heading) {
-		StringBuffer buff = new StringBuffer("#### ");
-		buff.append(heading);
-		return buff.toString();
-	}
+    static String h3(final String heading) {
+        StringBuilder buff = new StringBuilder("### ");
+        buff.append(heading);
+        return buff.toString();
+    }
 
-	static String cell(final String cellVal) {
-		return cell(cellVal, false);
-	}
+    static String h4(final String heading) {
+        StringBuilder buff = new StringBuilder("#### ");
+        buff.append(heading);
+        return buff.toString();
+    }
 
-	static String cell(final String cellVal, boolean isFirst) {
-		StringBuffer buff = (isFirst) ? new StringBuffer(cellDivOpen) : new StringBuffer(space);
-		buff.append(cellVal);
-		buff.append(cellDivCls);
-		return buff.toString();
-	}
+    static String cell(final String cellVal) {
+        return cell(cellVal, false);
+    }
 
-	static String makeHeadingLines(final String heading) {
-		int len = (heading == null || heading.isEmpty()) ? 1 : heading.length();
-		char[] chars = new char[len];
-		Arrays.fill(chars, hyphen);
-		return new String(chars);
-	}
+    static String cell(final String cellVal, boolean isFirst) {
+        StringBuilder buff = (isFirst) ? new StringBuilder(cellDivOpen) : new StringBuilder(SPACE);
+        buff.append(cellVal);
+        buff.append(cellDivCls);
+        return buff.toString();
+    }
 
-	static String concatDescription(List<String> description) {
-		if (description.isEmpty())
-			return space;
-		StringBuffer buff = new StringBuffer(description.get(0));
-		for (int i = 1; i < description.size(); i++) {
-			buff.append(htmlBr);
-			buff.append(description.get(i));
-		}
-		return buff.toString();
-	}
-	
-	static String href(final String href, final String textVal) {
-		StringBuffer buff = new StringBuffer("["); //$NON-NLS-1$
-		buff.append(textVal + "](");
-		buff.append(href + ")");
-		return buff.toString();
-	}
+    static String makeHeadingLines(final String heading) {
+        int len = (heading == null || heading.isEmpty()) ? 1 : heading.length();
+        char[] chars = new char[len];
+        Arrays.fill(chars, hyphen);
+        return new String(chars);
+    }
+
+    static String concatDescription(List<String> description) {
+        if (description.isEmpty())
+            return SPACE;
+        StringBuilder buff = new StringBuilder(description.get(0));
+        for (int i = 1; i < description.size(); i++) {
+            buff.append(htmlBr);
+            buff.append(description.get(i));
+        }
+        return buff.toString();
+    }
+
+    static String href(final String href, final String textVal) {
+        StringBuilder buff = new StringBuilder("["); //$NON-NLS-1$
+        buff.append(textVal + "](");
+        buff.append(href + ")");
+        return buff.toString();
+    }
 }
-

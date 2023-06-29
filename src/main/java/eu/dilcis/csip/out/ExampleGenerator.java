@@ -16,9 +16,9 @@ import java.io.UnsupportedEncodingException;
  */
 
 public final class ExampleGenerator extends XmlFragmentGenerator {
-	private final static String space = " "; //$NON-NLS-1$
-	private final static String exampleHead = "Example:"; //$NON-NLS-1$
-	private final static String exampleNumHead = "Example %s:"; //$NON-NLS-1$
+	private static final String SPACE = " "; //$NON-NLS-1$
+	private static final String EXAMPLE_HEAD = "Example:"; //$NON-NLS-1$
+	private static final String EXAMPLE_NUM_HEAD = "Example %s:"; //$NON-NLS-1$
 
 	public ExampleGenerator() throws UnsupportedEncodingException {
 		super();
@@ -29,18 +29,18 @@ public final class ExampleGenerator extends XmlFragmentGenerator {
 	}
 
 	public void startExample(final String label) throws IOException {
-		this.strExmpl(exampleHead, label);
+		this.strExmpl(EXAMPLE_HEAD, label);
 	}
 
 	public void startExample(final String label, final String number)
 			throws IOException {
-		this.strExmpl(String.format(exampleNumHead, number), label);
+		this.strExmpl(String.format(EXAMPLE_NUM_HEAD, number), label);
 	}
 
 	private void strExmpl(final String head, final String label)
 			throws IOException {
 		this.handler.nl();
-		this.handler.emit(GitHubMarkdownFormatter.makeBold(head) + space + label);
+		this.handler.emit(GitHubMarkdownFormatter.makeBold(head) + SPACE + label);
 		this.handler.nl();
 		this.handler.nl();
 		this.handler.emit(GitHubMarkdownFormatter.mdInlineXml);
