@@ -1,26 +1,11 @@
-Using Docker to Publish E-ARK Specifications
-============================================
+# Docker Image for Pandoc
 
-E-ARK-CSIP site tasks
-----------------------
+This [`Dockerfile`](./Dockerfile) builds a Docker image for [Pandoc](https://pandoc.org/) v2.5, which is used in the E-ARK publication workflow. The [Pandoc version was released in November 2018](https://pandoc.org/releases.html#pandoc-2.5-2018-11-27). An upgrade to [v2.19](https://pandoc.org/releases.html#pandoc-2.19.2-2022-08-22) release in August 2022 might be a good idea. An upgrade to [v3 or higher](https://pandoc.org/releases.html#pandoc-3.0-2023-01-18) might require more work/fixing breaking changes.
 
-### Local Docker publication of GitHub pages
-The markdown generation tasks have to have been run separately.
+The Docker image DOES NOT come with the `spec-publisher` project installed, which is confusing and a historical hangover. The Docker image is used to assemble the collateral produced by the `spec-publisher` project and execute Pandoc on them.
 
-Run from the project docs folder:
+## How it works
 
-```bash
-docker run -it --rm -v "$PWD":/usr/src/app -p "4000:4000" -e JEKYLL_GITHUB_TOKEN=<gh-token-here>  starefossen/github-pages
-```
+It's a little rough and ready for now. The box simply provides a working installation of Pandoc v2.5 and a `bash` entrypoint for running code. The base image is [`debian:stable`](https://hub.docker.com/_/debian) from the offical Debian Docker Hub repository. This is a little large and better options are available.
 
-E-ARK-CSIP PDF tasks
---------------------
-
-### Creating the Docker image
-
-### Publishing the PDF
-
-```bash
-docker run -it --rm -v "$PWD:/source" eark-pandoc ./pandoc-pre-post.sh
-docker run -it --rm -v "$PWD:/source" eark-pandoc ./pandoc-gen-csip.sh
-```
+Generally the box will be invoked as part of a publication workflow, e.g. from the `spec-publisher` project. The box is invoked with a `bash` command, which is usually a script, passed to the image `ENTRYPOINT`.
