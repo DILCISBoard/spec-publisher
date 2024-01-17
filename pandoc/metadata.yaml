@@ -8,6 +8,12 @@ titlepage-text-color: "3adeca"
 titlepage-rule-color: "3adeca"
 titlepage-rule-height: 1
 logo:	"../spec-publisher/pandoc/img/DILCISlogo.png"
+cofund:	"../spec-publisher/pandoc/img/cofund.jpg"
+logo:	"../spec-publisher/pandoc/img/DILCISlogo.png"
+dilcis-logo:	"../spec-publisher/pandoc/img/dilcis-logo.png"
+dlm-logo:	"../spec-publisher/pandoc/img/dlm-logo.jpg"
+eark-logo:	"../spec-publisher/pandoc/img/eark-logo.jpg"
+eu-logo:	"../spec-publisher/pandoc/img/eu-logo.png"
 toc-title:	"Table of contents"
 header-right:	DILCIS Board
 autoSectionLabels: True
