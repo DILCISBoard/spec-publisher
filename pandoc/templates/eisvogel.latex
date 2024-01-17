@@ -746,6 +746,42 @@ $if(title)$
 $if(beamer)$
 \frame{\titlepage}
 $endif$
+
+
+$if(title)$
+\begin{quote}
+\textbf{$title$}
+\end{quote}
+$endif$
+
+\includegraphics[width=1.56693in,height=1.08268in]{pandoc/img/eu-logo.png}
+
+\includegraphics[width=1.23774in,height=1.2375in]{pandoc/img/eark-logo.png}
+
+\begin{quote}
+The European Commission eArchiving procurement recognizes the E-ARK
+specifications as the eArchiving specifications which are funded under
+the eArchiving Common Services Platform Agreement No. LC-01905904-
+CNECT/LUX/2021/OP/0077.
+
+This speciﬁcation is published, supported, and developed by the Digital
+Information LifeCycle Interoperability Standards (DILCIS) Board under
+the auspices of the DLM Forum.
+
+\includegraphics[width=1.48882in,height=1.11042in]{pandoc/img/dlm-logo.png}\includegraphics[width=2.21654in,height=1.09333in]{$logo$}
+
+\includegraphics[width=1.49606in,height=0.31102in]{pandoc/img/cofund.jpg}
+
+This speciﬁcation was previously developed with the support of the
+European Union:
+
+E-ARK Grant No: 620998 CIP-ICT-PSP.2013.2.5
+
+E-ARK4ALL Agreement No. LC-00921441 CEF-TC-2018-15
+
+E-ARK3 Agreement No. LC-01390244 CEF-TC-2019-3
+\end{quote}
+
 $if(abstract)$
 \begin{abstract}
 \noindent\textbf{Executive Summary}\\
