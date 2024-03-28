@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.dilcis</groupId>
 	<artifactId>eark-csip-profile-processor</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0-SNAPSHOT</version>
 	<name>E-ARK CSIP METS Profile processor</name>
 	<description>SAX parser to generate Markdown requirement tables from the E-ARK CSIP METS Profile.</description>
 
@@ -16,6 +16,7 @@
 		<mvn.compiler.version>3.6.1</mvn.compiler.version>
 		<mvn.jar.version>3.0.2</mvn.jar.version>
 		<mvn.surefire.version>2.19.1</mvn.surefire.version>
+	    <picocli.version>4.7.0</picocli.version>
 	</properties>
 
 	<build>
@@ -60,7 +61,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
-					<finalName>mets-profile-proc</finalName>
+					<finalName>mets-profile-processor-${project.version}</finalName>
 					<appendAssemblyId>false</appendAssemblyId>
 					<archive>
 						<manifest>
@@ -70,7 +71,6 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
-					<appendAssemblyId>false</appendAssemblyId>
 				</configuration>
 				<executions>
 					<execution>
@@ -86,11 +86,27 @@
 	</build>
 
 	<dependencies>
+		<dependency>
+			<groupId>info.picocli</groupId>
+			<artifactId>picocli</artifactId>
+			<version>${picocli.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>2.2</version>            
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/junit/junit -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.13.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-params</artifactId>
+			<version>5.10.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
