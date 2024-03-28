@@ -1,0 +1,5 @@
+
+- name: requirements.METS.package
+  type: table
+  heading: "Table 3: Requirements for the information package"
+  requirements:

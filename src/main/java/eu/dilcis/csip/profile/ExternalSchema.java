@@ -15,8 +15,6 @@ import java.util.List;
  */
 
 public final class ExternalSchema {
-	final static String empty = ""; //$NON-NLS-1$
-	final static String defaultUrlVal = "http://example.com"; //$NON-NLS-1$
 	public final String name;
 	public final URI url;
 	public final String context;
@@ -32,9 +30,9 @@ public final class ExternalSchema {
 	}
 
 	public static class Builder {
-		private String nm = empty;
-		private URI rl = URI.create(defaultUrlVal);
-		private String cntxt = empty;
+		private String nm = Constants.EMPTY;
+		private URI rl = URI.create(Constants.DEFAULT_URI);
+		private String cntxt = Constants.EMPTY;
 		private List<String> nt = new ArrayList<>();
 
 		public Builder() {

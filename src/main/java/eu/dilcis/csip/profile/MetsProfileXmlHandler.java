@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -16,7 +17,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.NamespaceSupport;
 
-import eu.dilcis.csip.ProcessorOptions;
 import eu.dilcis.csip.out.ExampleGenerator;
 import eu.dilcis.csip.out.GitHubMarkdownTableGenerator;
 import eu.dilcis.csip.out.OutputHandler;
@@ -35,33 +35,6 @@ import eu.dilcis.csip.out.XmlCharBuffer;
 
 public final class MetsProfileXmlHandler extends DefaultHandler {
     private static final SAXParserFactory spf = SAXParserFactory.newInstance();
-    private static final String initSaxMess = "Couldn't initialise SAX XML Parser."; //$NON-NLS-1$
-    private static final String ioExcepMess = "IOException generating markdown tables."; //$NON-NLS-1$
-    private static final String sectIoMess = "Error opening example file for section %s."; //$NON-NLS-1$
-    private static final String empty = ""; //$NON-NLS-1$
-    private static final String space = " "; //$NON-NLS-1$
-    private static final String period = "."; //$NON-NLS-1$
-    private static final String headEle = "head"; //$NON-NLS-1$
-    private static final String appendixEle = "Appendix"; //$NON-NLS-1$
-    private static final String contextEle = "context"; //$NON-NLS-1$
-    private static final String exampleEle = "Example"; //$NON-NLS-1$
-    private static final String extSchemaEle = "external_schema"; //$NON-NLS-1$
-    private static final String maintEle = "maintenance_agency"; //$NON-NLS-1$
-    private static final String nameEle = "name"; //$NON-NLS-1$
-    private static final String uriEle = "URI"; //$NON-NLS-1$
-    private static final String urlEle = "URL"; //$NON-NLS-1$
-    private static final String vocabEle = "vocabulary"; //$NON-NLS-1$
-    private static final String exampleAtt = "EXAMPLES"; //$NON-NLS-1$
-    private static final String idAtt = "ID"; //$NON-NLS-1$
-    private static final String labelAtt = "LABEL"; //$NON-NLS-1$
-    private static final String numberAtt = "NUMBER"; //$NON-NLS-1$
-    private static final String anchorEle = "a"; //$NON-NLS-1$
-    private static final String paraEle = "p"; //$NON-NLS-1$
-    private static final String defTermEle = "dt"; //$NON-NLS-1$
-    private static final String defDefEle = "dd"; //$NON-NLS-1$
-
-    static final String xmlExtension = period + "xml"; //$NON-NLS-1$
-    static final String xmlProcInstr = "<?xml version='1.0' encoding='UTF-8'?>"; //$NON-NLS-1$
     static {
         spf.setNamespaceAware(true);
     }
@@ -70,13 +43,12 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
         try {
             saxParser = spf.newSAXParser();
         } catch (ParserConfigurationException | SAXException excep) {
-            throw new IllegalStateException(initSaxMess, excep);
+            throw new IllegalStateException(Constants.initSaxMess, excep);
         }
     }
 
-    private XmlCharBuffer charBuff = new XmlCharBuffer();
+    private final XmlCharBuffer charBuff = new XmlCharBuffer();
     private String currEleName;
-    private final ProcessorOptions opts;
     private boolean inRequirement = false;
     private boolean inExample = false;
     private boolean inAppendix = false;
@@ -87,9 +59,10 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
     private int reqCounter = 0;
     private String currDefTerm = null;
     private Section currentSect;
-    private NamespaceSupport namespaces = new NamespaceSupport();
+    private final NamespaceSupport namespaces = new NamespaceSupport();
     private boolean needNewContext = true;
-    private final Path projRoot;
+    private final Path projectRoot;
+    private final Path profilePath;
     private String currentHref = null;
 
     private final Map<Section, Set<String>> exampleMap = new HashMap<>();
@@ -101,10 +74,10 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
     private ExternalSchema.Builder schemaBuilder;
     private ControlledVocabulary.Builder vocabBuilder;
 
-    public MetsProfileXmlHandler(final ProcessorOptions opts) {
+    public MetsProfileXmlHandler(final Path profilePath) {
         super();
-        this.opts = opts;
-        this.projRoot = opts.profileFile.getParent().getParent();
+        this.profilePath = profilePath;
+        this.projectRoot = profilePath.getParent().getParent();
     }
     // ===========================================================
     // SAX DocumentHandler methods
@@ -112,11 +85,11 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
 
     public void processProfile() throws SAXException, IOException {
         this.reqsAppndxGen = GitHubMarkdownTableGenerator.instance();
-        saxParser.parse(this.opts.profileFile.toFile(), this);
+        saxParser.parse(this.profilePath.toFile(), this);
     }
 
     @Override
-    public void startPrefixMapping(String prefix, String uri) {
+    public void startPrefixMapping(final String prefix, final String uri) {
         if (needNewContext) {
             namespaces.pushContext();
             needNewContext = false;
@@ -125,15 +98,15 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
     }
 
     @Override
-    public void endPrefixMapping(String prefix) {
+    public void endPrefixMapping(final String prefix) {
         // add additional endElement() code...
         namespaces.popContext();
     }
 
     @Override
-    public void startElement(String namespaceURI, String sName, // simple name
-            String qName, // qualified name
-            Attributes attrs) throws SAXException {
+    public void startElement(final String namespaceURI, final String sName, // simple name
+            final String qName, // qualified name
+            final Attributes attrs) throws SAXException {
         if (needNewContext)
             namespaces.pushContext();
         needNewContext = true;
@@ -145,19 +118,19 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
             this.processRequirementChildStart(attrs);
         } else if (Section.isSection(this.currEleName)) {
             this.startSection();
-        } else if (exampleEle.equals(this.currEleName)) {
+        } else if (XmlConstants.EXAMPLE_ELE.equals(this.currEleName)) {
             this.startExample(attrs);
         } else if (this.inExample) {
             this.fragStart(this.getSectionExampleHandler(this.currentSect),
                     attrs, this.namespaces);
-        } else if (appendixEle.equals(this.currEleName)) {
+        } else if (XmlConstants.APPENDIX_ELE.equals(this.currEleName)) {
             this.startAppendix(attrs);
         } else if (this.inAppendix) {
             this.fragStart(this.appendixGenerator, attrs, this.namespaces);
-        } else if (extSchemaEle.equals(this.currEleName)) {
+        } else if (XmlConstants.EXTSCHEMA_ELE.equals(this.currEleName)) {
             this.inExtSchema = true;
             this.schemaBuilder = new ExternalSchema.Builder();
-        } else if (vocabEle.equals(this.currEleName)) {
+        } else if (XmlConstants.VOCAB_ELE.equals(this.currEleName)) {
             this.inVocab = true;
             this.vocabBuilder = new ControlledVocabulary.Builder().id(getId(attrs));
         }
@@ -165,30 +138,30 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
     }
 
     @Override
-    public void endElement(String namespaceURI, String sName, // simple name
-            String qName // qualified name
+    public void endElement(final String namespaceURI, final String sName, // simple name
+            final String qName // qualified name
     ) throws SAXException {
         this.currEleName = qName;
         if (Requirement.isRequirementEle(this.currEleName)) {
             this.processRequirementEle();
         } else if (this.inRequirement) {
             this.processRequirementChild();
-        } else if (exampleEle.equals(this.currEleName)) {
+        } else if (XmlConstants.EXAMPLE_ELE.equals(this.currEleName)) {
             endExample();
         } else if (this.inExample) {
             fragEnd(this.getSectionExampleHandler(this.currentSect));
         } else if (Section.isSection(this.currEleName)) {
             endSection();
-        } else if (appendixEle.equals(this.currEleName)) {
+        } else if (XmlConstants.APPENDIX_ELE.equals(this.currEleName)) {
             this.endAppendix();
         } else if (this.inAppendix) {
             fragEnd(this.appendixGenerator);
-        } else if (extSchemaEle.equals(this.currEleName)) {
+        } else if (XmlConstants.EXTSCHEMA_ELE.equals(this.currEleName)) {
             this.inExtSchema = false;
             this.schemaGen.add(this.schemaBuilder.build());
         } else if (this.inExtSchema) {
             this.processSchemaEle();
-        } else if (vocabEle.equals(this.currEleName)) {
+        } else if (XmlConstants.VOCAB_ELE.equals(this.currEleName)) {
             this.inVocab = false;
             this.schemaGen.add(this.vocabBuilder.build());
         } else if (this.inVocab) {
@@ -201,13 +174,13 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
     @Override
     public void endDocument() throws SAXException {
         try {
-            this.reqsAppndxGen.toTable(OutputHandler.toAppendix(this.projRoot, "requirements"));
-            this.schemaGen.generateAppendix(this.projRoot);
+            this.reqsAppndxGen.toTable(OutputHandler.toAppendix(this.projectRoot, "requirements"));
+            this.schemaGen.generateAppendix(this.projectRoot);
 
-            OutputHandler outHandler = OutputHandler.toStdOut();
-            for (Section sect : this.exampleMap.keySet()) {
-                System.out.println(sect.sectName);
-                for (String ex : this.exampleMap.get(sect)) {
+            final OutputHandler outHandler = OutputHandler.toStdOut();
+            for (final Entry<Section, Set<String>> entry : this.exampleMap.entrySet()) {
+                System.out.println(entry.getKey().sectName);
+                for (final String ex : entry.getValue()) {
                     System.out.println(ex);
                 }
             }
@@ -216,21 +189,21 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
             outHandler.nl();
             outHandler.emit("Total Requirements: " + this.reqCounter); //$NON-NLS-1$
             outHandler.nl();
-        } catch (IOException excep) {
-            throw new SAXException(ioExcepMess, excep);
+        } catch (final IOException excep) {
+            throw new SAXException(Constants.ioExcepMess, excep);
         }
     }
 
-    private void processRequirementAttrs(Attributes attrs) {
+    private void processRequirementAttrs(final Attributes attrs) {
         this.inRequirement = true;
         if (attrs == null)
             return;
         for (int i = 0; i < attrs.getLength(); i++) {
             String aName = attrs.getLocalName(i); // Attr name
-            if (Requirement.EMPTY.equals(aName))
+            if (Constants.EMPTY.equals(aName))
                 aName = attrs.getQName(i);
             this.reqBuilder.processAttr(aName, attrs.getValue(i));
-            if (exampleAtt.equals(aName)) {
+            if (XmlConstants.EXAMPLE_ATT.equals(aName)) {
                 this.processExampleAtt(attrs.getValue(i));
             }
         }
@@ -240,9 +213,9 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
         if (attVal == null || attVal.isEmpty()) {
             return;
         }
-        String[] exampleIds = (attVal.contains(space)) ? attVal.split(space)
+        final String[] exampleIds = (attVal.contains(Constants.space)) ? attVal.split(Constants.space)
                 : new String[] { attVal };
-        for (String exKey : exampleIds) {
+        for (final String exKey : exampleIds) {
             this.exampleMap.get(this.currentSect).add(exKey);
         }
     }
@@ -257,22 +230,18 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
         this.reqBuilder = new Requirement.Builder();
     }
 
-    private void processRequirementChildStart(Attributes eleAtts) {
-        switch (this.currEleName) {
-            case anchorEle:
-                this.reqBuilder.descPart(this.charBuff.getBufferValue());
-                this.currentHref = this.getHref(eleAtts);
-                break;
-            default:
-                break;
+    private void processRequirementChildStart(final Attributes eleAtts) {
+        if (XmlConstants.ANCHOR_ELE.equals(this.currEleName)) {
+            this.reqBuilder.descPart(this.charBuff.getBufferValue());
+            this.currentHref = this.getHref(eleAtts);
         }
     }
 
-    private String getHref(Attributes attrs) {
+    private String getHref(final Attributes attrs) {
         if (attrs == null)
             return null;
         for (int i = 0; i < attrs.getLength(); i++) {
-            String aName = attrs.getLocalName(i); // Attr name
+            final String aName = attrs.getLocalName(i); // Attr name
             if ("href".equals(aName))
                 return attrs.getValue(i);
         }
@@ -281,21 +250,21 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
 
     private void processRequirementChild() {
         switch (this.currEleName) {
-            case headEle:
+            case XmlConstants.HEAD_ELE:
                 this.reqBuilder.name(this.charBuff.getBufferValue());
                 break;
-            case defTermEle:
+            case XmlConstants.DEFTERM_ELE:
                 this.currDefTerm = this.charBuff.getBufferValue();
                 break;
-            case defDefEle:
+            case XmlConstants.DEFDEF_ELE:
                 this.reqBuilder.defPair(this.currDefTerm,
                         this.charBuff.getBufferValue());
                 break;
-            case paraEle:
+            case XmlConstants.PARA_ELE:
                 this.reqBuilder.description(this.charBuff.getBufferValue());
                 break;
-            case anchorEle:
-                String buffVal = this.charBuff.getBufferValue();
+            case XmlConstants.ANCHOR_ELE:
+                final String buffVal = this.charBuff.getBufferValue();
                 this.reqBuilder.descPart(" [" + buffVal + "](" + this.currentHref + ") ");
                 break;
             default:
@@ -305,16 +274,16 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
 
     private void processSchemaEle() {
         switch (this.currEleName) {
-            case nameEle:
+            case XmlConstants.NAME_ELE:
                 this.schemaBuilder.name(this.charBuff.getBufferValue());
                 break;
-            case urlEle:
+            case XmlConstants.URL_ELE:
                 this.schemaBuilder.url(this.charBuff.getBufferValue());
                 break;
-            case contextEle:
+            case XmlConstants.CONTEXT_ELE:
                 this.schemaBuilder.context(this.charBuff.getBufferValue());
                 break;
-            case paraEle:
+            case XmlConstants.PARA_ELE:
                 this.schemaBuilder.note(this.charBuff.getBufferValue());
                 break;
             default:
@@ -324,19 +293,13 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
 
     private void processVocabEle() {
         switch (this.currEleName) {
-            case nameEle:
+            case XmlConstants.NAME_ELE:
                 this.vocabBuilder.name(this.charBuff.getBufferValue());
                 break;
-            case maintEle:
-                this.vocabBuilder.maintenanceAgency(this.charBuff.getBufferValue());
-                break;
-            case uriEle:
-                this.vocabBuilder.uri(this.charBuff.getBufferValue());
-                break;
-            case contextEle:
+            case XmlConstants.MAINT_ELE:
                 this.vocabBuilder.context(this.charBuff.getBufferValue());
                 break;
-            case paraEle:
+            case XmlConstants.PARA_ELE:
                 this.vocabBuilder.description(this.charBuff.getBufferValue());
                 break;
             default:
@@ -354,9 +317,9 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
         this.currentSect = Section.fromEleName(this.currEleName);
         try {
             this.tableGen.toTable(OutputHandler
-                    .toSectionRequirements(this.projRoot, this.currentSect));
-        } catch (IOException excep) {
-            throw new SAXException(ioExcepMess, excep);
+                    .toSectionRequirements(this.projectRoot, this.currentSect));
+        } catch (final IOException excep) {
+            throw new SAXException(Constants.ioExcepMess, excep);
         }
         this.reqCounter += this.tableGen.size();
     }
@@ -364,13 +327,13 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
     private void startExample(final Attributes attrs) throws SAXException {
         this.inExample = true;
         final String id = getId(attrs);
-        for (Section section : this.exampleMap.keySet()) {
+        for (final Section section : this.exampleMap.keySet()) {
             if (this.exampleMap.get(section).contains(id)) {
-                ExampleGenerator gene = this.getSectionExampleHandler(section);
+                final ExampleGenerator gene = this.getSectionExampleHandler(section);
                 try {
                     gene.startExample(getLabel(attrs));
-                } catch (IOException excep) {
-                    throw new SAXException(ioExcepMess, excep);
+                } catch (final IOException excep) {
+                    throw new SAXException(Constants.ioExcepMess, excep);
                 }
                 return;
             }
@@ -378,11 +341,11 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
     }
 
     private void endExample() throws SAXException {
-        ExampleGenerator gene = this.getSectionExampleHandler(this.currentSect);
+        final ExampleGenerator gene = this.getSectionExampleHandler(this.currentSect);
         try {
             gene.endExample();
-        } catch (IOException excep) {
-            throw new SAXException(ioExcepMess, excep);
+        } catch (final IOException excep) {
+            throw new SAXException(Constants.ioExcepMess, excep);
         }
         this.inExample = false;
     }
@@ -392,33 +355,33 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
         try {
             if (this.appendixGenerator == null)
                 this.appendixGenerator = new ExampleGenerator(OutputHandler
-                        .toAppendix(this.projRoot, exampleAtt.toLowerCase()));
+                        .toAppendix(this.projectRoot, XmlConstants.EXAMPLE_ATT.toLowerCase()));
             this.appendixGenerator.startExample(getLabel(attrs),
                     getNumber(attrs));
-        } catch (IOException excep) {
-            throw new SAXException(ioExcepMess, excep);
+        } catch (final IOException excep) {
+            throw new SAXException(Constants.ioExcepMess, excep);
         }
     }
 
     private void endAppendix() throws SAXException {
         try {
             this.appendixGenerator.endExample();
-        } catch (IOException excep) {
-            throw new SAXException(ioExcepMess, excep);
+        } catch (final IOException excep) {
+            throw new SAXException(Constants.ioExcepMess, excep);
         }
         this.inAppendix = false;
     }
 
     private static String getId(final Attributes attrs) {
-        return getAttValue(attrs, idAtt);
+        return getAttValue(attrs, XmlConstants.ID_ATT);
     }
 
     private static String getLabel(final Attributes attrs) {
-        return getAttValue(attrs, labelAtt);
+        return getAttValue(attrs, XmlConstants.LABEL_ATT);
     }
 
     private static String getNumber(final Attributes attrs) {
-        return getAttValue(attrs, numberAtt);
+        return getAttValue(attrs, XmlConstants.NUMBER_ATT);
     }
 
     private static String getAttValue(final Attributes attrs,
@@ -426,45 +389,45 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
         if (attrs != null) {
             for (int i = 0; i < attrs.getLength(); i++) {
                 String aName = attrs.getLocalName(i); // Attr name
-                if (empty.equals(aName))
+                if (Constants.empty.equals(aName))
                     aName = attrs.getQName(i);
                 if (attName.equals(aName))
                     return attrs.getValue(i);
             }
         }
-        return empty;
+        return Constants.empty;
     }
 
-    private void fragStart(ExampleGenerator generator, final Attributes attrs, final NamespaceSupport namespaces)
+    private void fragStart(final ExampleGenerator generator, final Attributes attrs, final NamespaceSupport namespaces)
             throws SAXException {
         try {
             generator.outputEleStart(this.currEleName, attrs, namespaces);
-        } catch (IOException excep) {
-            throw new SAXException(ioExcepMess, excep);
+        } catch (final IOException excep) {
+            throw new SAXException(Constants.ioExcepMess, excep);
         }
     }
 
-    private void fragEnd(ExampleGenerator generator) throws SAXException {
+    private void fragEnd(final ExampleGenerator generator) throws SAXException {
         try {
             generator.outputEleEnd(this.currEleName,
                     this.charBuff.voidBuffer());
-        } catch (IOException excep) {
-            throw new SAXException(ioExcepMess, excep);
+        } catch (final IOException excep) {
+            throw new SAXException(Constants.ioExcepMess, excep);
         }
     }
 
-    private ExampleGenerator getSectionExampleHandler(Section section)
+    private ExampleGenerator getSectionExampleHandler(final Section section)
             throws SAXException {
         ExampleGenerator gene = this.exampleHandlers.get(section);
         try {
             if (gene == null) {
-                OutputHandler handler = OutputHandler
-                        .toSectionExamples(this.projRoot, section);
+                final OutputHandler handler = OutputHandler
+                        .toSectionExamples(this.projectRoot, section);
                 gene = new ExampleGenerator(handler);
                 this.exampleHandlers.put(section, gene);
             }
-        } catch (IOException e) {
-            throw new SAXException(String.format(sectIoMess, section.sectName),
+        } catch (final IOException e) {
+            throw new SAXException(String.format(Constants.sectIoMess, section.sectName),
                     e);
         }
         this.currentSect = section;
@@ -472,8 +435,8 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
     }
 
     @Override
-    public void characters(char buf[], int offset, int len) {
-        String toAdd = new String(buf, offset, len);
+    public void characters(final char[] buf, final int offset, final int len) {
+        final String toAdd = new String(buf, offset, len);
         this.charBuff.addToBuffer(toAdd);
     }
 }

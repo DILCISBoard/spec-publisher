@@ -1,0 +1,10 @@
+
+- name: requirements.METS.package
+  heading: "Table 3: Requirements for the information package"
+  requirements:
+    - GEO_2
+    - GEO_3
+    - GEO_4
+    - GEO_5
+    - GEO_6
+    - GEO_7

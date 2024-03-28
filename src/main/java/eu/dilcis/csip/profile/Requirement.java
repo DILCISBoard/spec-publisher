@@ -14,15 +14,11 @@ public class Requirement {
     final List<String> examples;
     public final String xPath;
     public final String cardinality;
-    static final String CARD_TERM = "Cardinality"; //$NON-NLS-1$
-    static final String XPATH_TERM = "METS XPath"; //$NON-NLS-1$
-    static final String REQUIREMENT = "requirement"; //$NON-NLS-1$
-    static final String EMPTY = ""; //$NON-NLS-1$
 
     private Requirement() {
-        this(Requirement.RequirementId.DEFAULT_ID, EMPTY,
-                EMPTY, EMPTY, Collections.emptyList(),
-                Collections.emptyList(), EMPTY, EMPTY);
+        this(Requirement.RequirementId.DEFAULT_ID, Constants.EMPTY,
+                Constants.EMPTY, Constants.EMPTY, Collections.emptyList(),
+                Collections.emptyList(), Constants.EMPTY, Constants.EMPTY);
     }
 
     Requirement(final Requirement.RequirementId id, final String name,
@@ -38,6 +34,10 @@ public class Requirement {
         this.examples = examples;
         this.xPath = xPath;
         this.cardinality = cardinality;
+    }
+
+    public Requirement.RequirementId getId() {
+        return this.id;
     }
 
     public String[] relatedMatter() {
@@ -159,7 +159,7 @@ public class Requirement {
     }
 
     static boolean isRequirementEle(final String eleName) {
-        return Requirement.REQUIREMENT.equals(eleName);
+        return Constants.REQUIREMENT.equals(eleName);
     }
 
     static class Builder {
@@ -306,9 +306,9 @@ public class Requirement {
          */
         public Requirement.Builder defPair(final String term, final String def) {
             switch (term) {
-                case Requirement.XPATH_TERM:
+                case Constants.XPATH_TERM:
                     return this.xPath(def);
-                case Requirement.CARD_TERM:
+                case Constants.CARD_TERM:
                     return this.cardinality(def);
                 default:
                     break;
@@ -345,20 +345,27 @@ public class Requirement {
     }
 
     public static class RequirementId implements Comparable<RequirementId> {
-        final static String defPrefix = "PREF"; //$NON-NLS-1$
-        final static int defNumber = -1;
-        public final static RequirementId DEFAULT_ID = new RequirementId();
+        static final String DEF_PREFIX = "PREF"; //$NON-NLS-1$
+        static final String DEF_SUFFIX = "SUFF"; //$NON-NLS-1$
+        static final int DEF_NUMBER = -1;
+        public static final RequirementId DEFAULT_ID = new RequirementId();
         public final String prefix;
         public final int number;
+        public final String suffix;
 
         private RequirementId() {
-            this(defPrefix, defNumber);
+            this(DEF_PREFIX, DEF_NUMBER, DEF_SUFFIX);
         }
 
         private RequirementId(final String prefix, final int number) {
+            this(prefix, number, "");
+        }
+
+        private RequirementId(final String prefix, final int number, final String suffix) {
             super();
             this.prefix = prefix;
             this.number = number;
+            this.suffix = suffix;
         }
 
         /**
@@ -372,11 +379,15 @@ public class Requirement {
 
         @Override
         public int compareTo(final RequirementId other) {
-            if (other.prefix.equals(this.prefix)) {
-                return (this.number < other.number) ? -1
-                        : (this.number == other.number) ? 0 : -1;
+            if (this.prefix.equals(other.prefix) && this.suffix.equals(other.suffix)) {
+                if (this.number < other.number)
+                    return -1;
+                return (this.number == other.number) ? 0 : 1;
             }
-            return this.prefix.compareTo(other.prefix);
+            if (!this.prefix.equals(other.prefix)) {
+                return this.prefix.compareTo(other.suffix);
+            }
+            return this.suffix.compareTo(other.prefix);
         }
 
         /**
@@ -422,17 +433,22 @@ public class Requirement {
 
         static RequirementId fromIdString(final String idString) {
             StringBuilder prefixBuff = new StringBuilder();
+            StringBuilder suffixBuff = new StringBuilder();
             StringBuilder numBuff = new StringBuilder();
+            boolean isPrefix = true;
             for (int i = 0; i < idString.length(); i++) {
                 char c = idString.charAt(i);
                 if (Character.isDigit(c)) {
                     numBuff.append(c);
-                } else {
+                    isPrefix = false;
+                } else if (isPrefix) {
                     prefixBuff.append(c);
+                } else {
+                    suffixBuff.append(c);
                 }
             }
             return new RequirementId(prefixBuff.toString(),
-                    Integer.parseInt(numBuff.toString()));
+                    Integer.parseInt(numBuff.toString()), suffixBuff.toString());
         }
     }
 }

@@ -70,6 +70,62 @@ You can do the following:
    This is usually done using the GitHub pages Docker box, e.g. `docker run --rm -v "$PWD"/docs:/usr/src/app -v "$PWD"/_site:/_site -u "$(id -u):$(id -g)" starefossen/github-pages jekyll build -d /_site`, which uses the `./docs` directory as a source and generates a site in `./_site`.
 7. Publish the generated site to GitHub.
 
+## Preparing a Specification for Publication
+
+The specification publication process produces an E-ARK specification website and the PDF specification document. These can be generated from the following sources, or a combination of sources:
+
+- a METS profile XML document describing the specifcation and its requirements (these are extracted by the spec-publisher Java project described below);
+- markdown files for text content, e.g. `schema.md`, `requirements.md`, `examples.md` or `appendices.md`;
+- HTML, or LaTex files for the same;
+- images to accompany the text content, these can be included in the text source using the appropriate markdown or HTML syntax; and
+- metadata in a top-level YAML metadata file, e.g. `metadata.yml`.
+
+### Directory Structure
+
+The directory structure for the specification is fairly arbitary. The files can be concatenated in any order to form a final specification document. That said, following a convention will make the process easier to manage, and share. The following is a typical structure:
+
+```plaintext
+archived/
+  - old versions of the specification PDF documents.
+examples/
+  - example information packages in archive format.
+profile/
+  - the METS profile XML documents for all versions of the specification.
+schema/
+  - any supporting XML schema documents, e.g. METS extensions, the METS Profile and METS schema documents, etc.
+spec-publisher/
+  - the spec-publisher Java project, if required.
+specification/
+  - the text and image files that comprise the specification source.
+```
+
+### Metadata
+
+The metadata for the specification is stored in a top-level YAML file within the specification directory, e.g. `specification/metadata.md`. Currently the supported fields are:
+
+- `title`: the title of the specification;
+- `subtitle`: the subtitle of the specification;
+- `abstract`: a short abstract of the specification;
+- `version`: the version number of the specification (usually templated, see below); and
+- `date`: the release date of the specification (usually templated, see below).
+
+Here's the CSIP as an example:
+
+```yaml
+---
+title: E-ARK CSIP
+subtitle: Common Specification for Information Packages
+abstract: |
+        This base profile describes the Common Specification for Information
+        Packages (CSIP) and the implementation of METS for packaging OAIS
+        rest of abstract here...
+version: ${RELEASE_VERSION}
+date: ${RELEASE_DATE}
+---
+```
+
+The templated fields `${RELEASE_VERSION}` and `${RELEASE_DATE}` are replaced by the publication workflow, e.g. by the GitHub Actions workflow. The values are derived from the last git tag, or the current release tag.
+
 ## The spec-publisher Java Project
 
 ### Build from source
