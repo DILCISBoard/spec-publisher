@@ -27,16 +27,16 @@ enum XmlFormatter {
 	private static final String eleClose = ">"; //$NON-NLS-1$
 
 	static String indent(final int indentCount, final int indentSpaces) {
-		int indentSize = indentCount * indentSpaces;
+		final int indentSize = indentCount * indentSpaces;
 		if (indentSize < 1)
 			return empty;
-		char[] chars = new char[indentSize];
+		final char[] chars = new char[indentSize];
 		Arrays.fill(chars, ' ');
 		return new String(chars);
 	}
 
 	static String eleStartTag(final String eleName, final Attributes attrs, final NamespaceSupport namespaces) {
-		StringBuffer retVal = makeEleTag(eleName, false);
+		final StringBuffer retVal = makeEleTag(eleName, false);
 		if ("mets:mets".equals(eleName)) {
 			addNsDecs(retVal, namespaces);
 		}
@@ -53,7 +53,7 @@ enum XmlFormatter {
 	}
 
 	static StringBuffer addNsDecs(final StringBuffer buff, final NamespaceSupport namespaces) {
-		for (Enumeration<String> prefixs = namespaces.getPrefixes(); prefixs.hasMoreElements();) {
+		for (final Enumeration<String> prefixs = namespaces.getPrefixes(); prefixs.hasMoreElements();) {
 			final String prefix = prefixs.nextElement();
 			if ("xml".equals(prefix)) {
 				continue;
@@ -75,6 +75,12 @@ enum XmlFormatter {
 		return buff;
 	}
 
+	static String eleEndTag(final String eleName) {
+		final StringBuffer retVal = makeEleTag(eleName, true);
+		retVal.append(eleClose);
+		return retVal.toString();
+	}
+
 	private static StringBuffer eleAttribute(final StringBuffer buff, final String attName, final String attValue) {
 		buff.append(space);
 		buff.append(attName);
@@ -84,14 +90,8 @@ enum XmlFormatter {
 		return buff;
 	}
 
-	static String eleEndTag(final String eleName) {
-		StringBuffer retVal = makeEleTag(eleName, true);
-		retVal.append(eleClose);
-		return retVal.toString();
-	}
-
 	private static StringBuffer makeEleTag(final String eleName, final boolean isEnd) {
-		StringBuffer retVal = (isEnd) ? new StringBuffer(eleFinishOpen) : new StringBuffer(eleStartOpen);
+		final StringBuffer retVal = (isEnd) ? new StringBuffer(eleFinishOpen) : new StringBuffer(eleStartOpen);
 		retVal.append(eleName);
 		return retVal;
 	}

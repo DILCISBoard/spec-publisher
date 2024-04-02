@@ -9,9 +9,27 @@ public enum Section {
 	STRUCT_MAP("structMap", "6", "structmap", "structMap");  //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
 	// STRUCT_LINK("structLink", "7", "structural link", "structLink"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
+	public static boolean isSection(final String eleName) {
+		for (final Section sect : Section.values()) {
+			if (sect.eleName.equals(eleName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public static Section fromEleName(final String eleName) {
+		for (final Section sect : Section.values()) {
+			if (sect.eleName.equals(eleName)) {
+				return sect;
+			}
+		}
+		return null;
+	}
 	public final String eleName;
 	public final String sectName;
+
 	public final String sectSubHeadNum;
+
 	public final String metsEleName;
 
 	private Section(final String eleName, final String sectSubHeadNum,
@@ -24,23 +42,5 @@ public enum Section {
 
 	public String getDirName() {
 		return this.metsEleName;
-	}
-
-	public static boolean isSection(final String eleName) {
-		for (Section sect : Section.values()) {
-			if (sect.eleName.equals(eleName)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static Section fromEleName(final String eleName) {
-		for (Section sect : Section.values()) {
-			if (sect.eleName.equals(eleName)) {
-				return sect;
-			}
-		}
-		return null;
 	}
 }

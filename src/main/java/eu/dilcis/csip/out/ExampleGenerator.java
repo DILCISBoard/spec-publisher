@@ -37,6 +37,13 @@ public final class ExampleGenerator extends XmlFragmentGenerator {
 		this.strExmpl(String.format(EXAMPLE_NUM_HEAD, number), label);
 	}
 
+	public void endExample() throws IOException {
+		this.handler.nl();
+		this.handler.emit(GitHubMarkdownFormatter.mdInlineMarker);
+		this.handler.nl();
+		this.handler.nl();
+	}
+
 	private void strExmpl(final String head, final String label)
 			throws IOException {
 		this.handler.nl();
@@ -44,12 +51,5 @@ public final class ExampleGenerator extends XmlFragmentGenerator {
 		this.handler.nl();
 		this.handler.nl();
 		this.handler.emit(GitHubMarkdownFormatter.mdInlineXml);
-	}
-
-	public void endExample() throws IOException {
-		this.handler.nl();
-		this.handler.emit(GitHubMarkdownFormatter.mdInlineMarker);
-		this.handler.nl();
-		this.handler.nl();
 	}
 }

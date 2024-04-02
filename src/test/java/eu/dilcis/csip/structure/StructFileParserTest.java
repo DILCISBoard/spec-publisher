@@ -19,6 +19,7 @@ import eu.dilcis.csip.profile.Requirement;
 import eu.dilcis.csip.structure.SpecificationStructure.Section;
 import eu.dilcis.csip.structure.SpecificationStructure.Table;
 
+
 public class StructFileParserTest {
     private static final List<Requirement> requirements = new ArrayList<>();
     private static final Path STRUCT_ROOT = Path

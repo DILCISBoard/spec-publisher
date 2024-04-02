@@ -20,7 +20,7 @@ public final class XmlCharBuffer {
 	 * Get the value of the text buffer and erase the buffer contents
 	 */
 	public String voidBuffer() {
-		String retVal = this.getBufferValue();
+		final String retVal = this.getBufferValue();
 		this.textBuffer = null;
 		return retVal;
 	}

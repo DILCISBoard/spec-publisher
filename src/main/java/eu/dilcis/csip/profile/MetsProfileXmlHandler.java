@@ -2,7 +2,7 @@ package eu.dilcis.csip.profile;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -47,6 +47,28 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
         }
     }
 
+    private static String getId(final Attributes attrs) {
+        return getAttValue(attrs, XmlConstants.ID_ATT);
+    }
+    private static String getLabel(final Attributes attrs) {
+        return getAttValue(attrs, XmlConstants.LABEL_ATT);
+    }
+    private static String getNumber(final Attributes attrs) {
+        return getAttValue(attrs, XmlConstants.NUMBER_ATT);
+    }
+    private static String getAttValue(final Attributes attrs,
+            final String attName) {
+        if (attrs != null) {
+            for (int i = 0; i < attrs.getLength(); i++) {
+                String aName = attrs.getLocalName(i); // Attr name
+                if (Constants.empty.equals(aName))
+                    aName = attrs.getQName(i);
+                if (attName.equals(aName))
+                    return attrs.getValue(i);
+            }
+        }
+        return Constants.empty;
+    }
     private final XmlCharBuffer charBuff = new XmlCharBuffer();
     private String currEleName;
     private boolean inRequirement = false;
@@ -60,18 +82,22 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
     private String currDefTerm = null;
     private Section currentSect;
     private final NamespaceSupport namespaces = new NamespaceSupport();
+
     private boolean needNewContext = true;
     private final Path projectRoot;
     private final Path profilePath;
     private String currentHref = null;
 
-    private final Map<Section, Set<String>> exampleMap = new HashMap<>();
-    private final Map<Section, ExampleGenerator> exampleHandlers = new HashMap<>();
+    private final Map<Section, Set<String>> exampleMap = new EnumMap<>(Section.class);
+    private final Map<Section, ExampleGenerator> exampleHandlers = new EnumMap<>(Section.class);
     private ExampleGenerator appendixGenerator = null;
+
     private RequirementTableGenerator reqsAppndxGen;
 
     private final SchemaAppendixGenerator schemaGen = new SchemaAppendixGenerator();
+
     private ExternalSchema.Builder schemaBuilder;
+
     private ControlledVocabulary.Builder vocabBuilder;
 
     public MetsProfileXmlHandler(final Path profilePath) {
@@ -192,6 +218,12 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
         } catch (final IOException excep) {
             throw new SAXException(Constants.ioExcepMess, excep);
         }
+    }
+
+    @Override
+    public void characters(final char[] buf, final int offset, final int len) {
+        final String toAdd = new String(buf, offset, len);
+        this.charBuff.addToBuffer(toAdd);
     }
 
     private void processRequirementAttrs(final Attributes attrs) {
@@ -327,9 +359,9 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
     private void startExample(final Attributes attrs) throws SAXException {
         this.inExample = true;
         final String id = getId(attrs);
-        for (final Section section : this.exampleMap.keySet()) {
-            if (this.exampleMap.get(section).contains(id)) {
-                final ExampleGenerator gene = this.getSectionExampleHandler(section);
+        for (final Entry<Section, Set<String>> sectionEntry : this.exampleMap.entrySet()) {
+            if (sectionEntry.getValue().contains(id)) {
+                final ExampleGenerator gene = this.getSectionExampleHandler(sectionEntry.getKey());
                 try {
                     gene.startExample(getLabel(attrs));
                 } catch (final IOException excep) {
@@ -372,32 +404,6 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
         this.inAppendix = false;
     }
 
-    private static String getId(final Attributes attrs) {
-        return getAttValue(attrs, XmlConstants.ID_ATT);
-    }
-
-    private static String getLabel(final Attributes attrs) {
-        return getAttValue(attrs, XmlConstants.LABEL_ATT);
-    }
-
-    private static String getNumber(final Attributes attrs) {
-        return getAttValue(attrs, XmlConstants.NUMBER_ATT);
-    }
-
-    private static String getAttValue(final Attributes attrs,
-            final String attName) {
-        if (attrs != null) {
-            for (int i = 0; i < attrs.getLength(); i++) {
-                String aName = attrs.getLocalName(i); // Attr name
-                if (Constants.empty.equals(aName))
-                    aName = attrs.getQName(i);
-                if (attName.equals(aName))
-                    return attrs.getValue(i);
-            }
-        }
-        return Constants.empty;
-    }
-
     private void fragStart(final ExampleGenerator generator, final Attributes attrs, final NamespaceSupport namespaces)
             throws SAXException {
         try {
@@ -432,11 +438,5 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
         }
         this.currentSect = section;
         return gene;
-    }
-
-    @Override
-    public void characters(final char[] buf, final int offset, final int len) {
-        final String toAdd = new String(buf, offset, len);
-        this.charBuff.addToBuffer(toAdd);
     }
 }
