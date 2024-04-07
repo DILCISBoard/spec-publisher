@@ -27,7 +27,9 @@ public final class StructFileParser {
     public static StructFileParser parserInstance(final Collection<MetsProfile> profiles) {
         return new StructFileParser(profiles);
     }
-    static Table tableFromMap(final Path root, final String name, final Map<String, Object> entryMap) throws ParseException {
+
+    static Table tableFromMap(final Path root, final String name, final Map<String, Object> entryMap)
+            throws ParseException {
         try {
             final String heading = stringFromMap(name, "heading", entryMap);
             final Path path = pathFromMap(root, name, entryMap);
@@ -62,7 +64,8 @@ public final class StructFileParser {
         return ids;
     }
 
-    private static Path pathFromMap(final Path root, final String name, final Map<String, Object> entryMap) throws ParseException {
+    private static Path pathFromMap(final Path root, final String name, final Map<String, Object> entryMap)
+            throws ParseException {
         try {
             return root.resolve(stringFromMap(name, "path", entryMap));
         } catch (final InvalidPathException e) {
@@ -121,7 +124,8 @@ public final class StructFileParser {
             throws ParseException {
         final Path path = pathFromMap(this.root, name, entryMap);
         if (!Files.exists(path) || Files.isDirectory(path)) {
-            throw new ParseException("Source file does not exist, or is a directory: " + path);
+            throw new ParseException(
+                    "Source file does not exist, or is a directory: " + path + " for section: " + name);
         }
         return SpecificationStructure.sectionFromValues(name, path, type);
     }

@@ -49,10 +49,6 @@ public final class MetsProfileProcessor implements Callable<Integer> {
             "--file" }, required = true, paramLabel = "SPECIFICATION", description = "A YAML file that describes the specification structure.")
     private File structureFile;
 
-    private MetsProfileProcessor() {
-        throw new IllegalStateException();
-    }
-
     @Override
     public Integer call() {
         int result = 0;
