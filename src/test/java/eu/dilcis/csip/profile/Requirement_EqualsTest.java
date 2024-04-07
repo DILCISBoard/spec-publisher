@@ -21,4 +21,9 @@ public class Requirement_EqualsTest {
     public void testEqualsHashRequirement() {
         EqualsVerifier.forClass(Requirement.class).verify();
     }
+
+    @Test
+    public void testEqualsHashAppendix() {
+        EqualsVerifier.forClass(Appendix.class).verify();
+    }
 }

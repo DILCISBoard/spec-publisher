@@ -14,6 +14,7 @@
 - name: requirements.METS.package_reps
   type: table
   heading: "Table 2: Geospatial information package requirement"
+  path: "requirements/METS/package_reps/requirements.md"
   requirements:
     - GEO_1
 
@@ -23,6 +24,7 @@
 
 - name: requirements.METS.package
   type: table
+  path: "requirements/METS/package/requirements.md"
   heading: "Table 3: Requirements for the information package"
   requirements:
     - GEO_2

@@ -43,32 +43,36 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
         try {
             saxParser = spf.newSAXParser();
         } catch (ParserConfigurationException | SAXException excep) {
-            throw new IllegalStateException(Constants.initSaxMess, excep);
+            throw new IllegalStateException(Constants.INIT_SAX_MESS, excep);
         }
     }
 
     private static String getId(final Attributes attrs) {
         return getAttValue(attrs, XmlConstants.ID_ATT);
     }
+
     private static String getLabel(final Attributes attrs) {
         return getAttValue(attrs, XmlConstants.LABEL_ATT);
     }
+
     private static String getNumber(final Attributes attrs) {
         return getAttValue(attrs, XmlConstants.NUMBER_ATT);
     }
+
     private static String getAttValue(final Attributes attrs,
             final String attName) {
         if (attrs != null) {
             for (int i = 0; i < attrs.getLength(); i++) {
                 String aName = attrs.getLocalName(i); // Attr name
-                if (Constants.empty.equals(aName))
+                if (Constants.EMPTY.equals(aName))
                     aName = attrs.getQName(i);
                 if (attName.equals(aName))
                     return attrs.getValue(i);
             }
         }
-        return Constants.empty;
+        return Constants.EMPTY;
     }
+
     private final XmlCharBuffer charBuff = new XmlCharBuffer();
     private String currEleName;
     private boolean inRequirement = false;
@@ -138,7 +142,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
         needNewContext = true;
         // Get the current ele name
         this.currEleName = qName;
-        if (Requirement.isRequirementEle(this.currEleName)) {
+        if (XmlConstants.REQUIREMENT_ELE.equals(this.currEleName)) {
             this.processRequirementAttrs(attrs);
         } else if (this.inRequirement) {
             this.processRequirementChildStart(attrs);
@@ -168,7 +172,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
             final String qName // qualified name
     ) throws SAXException {
         this.currEleName = qName;
-        if (Requirement.isRequirementEle(this.currEleName)) {
+        if (XmlConstants.REQUIREMENT_ELE.equals(this.currEleName)) {
             this.processRequirementEle();
         } else if (this.inRequirement) {
             this.processRequirementChild();
@@ -216,7 +220,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
             outHandler.emit("Total Requirements: " + this.reqCounter); //$NON-NLS-1$
             outHandler.nl();
         } catch (final IOException excep) {
-            throw new SAXException(Constants.ioExcepMess, excep);
+            throw new SAXException(Constants.MESS_IO_EXCEP, excep);
         }
     }
 
@@ -245,7 +249,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
         if (attVal == null || attVal.isEmpty()) {
             return;
         }
-        final String[] exampleIds = (attVal.contains(Constants.space)) ? attVal.split(Constants.space)
+        final String[] exampleIds = (attVal.contains(Constants.SPACE)) ? attVal.split(Constants.SPACE)
                 : new String[] { attVal };
         for (final String exKey : exampleIds) {
             this.exampleMap.get(this.currentSect).add(exKey);
@@ -351,7 +355,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
             this.tableGen.toTable(OutputHandler
                     .toSectionRequirements(this.projectRoot, this.currentSect));
         } catch (final IOException excep) {
-            throw new SAXException(Constants.ioExcepMess, excep);
+            throw new SAXException(Constants.MESS_IO_EXCEP, excep);
         }
         this.reqCounter += this.tableGen.size();
     }
@@ -365,7 +369,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
                 try {
                     gene.startExample(getLabel(attrs));
                 } catch (final IOException excep) {
-                    throw new SAXException(Constants.ioExcepMess, excep);
+                    throw new SAXException(Constants.MESS_IO_EXCEP, excep);
                 }
                 return;
             }
@@ -377,7 +381,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
         try {
             gene.endExample();
         } catch (final IOException excep) {
-            throw new SAXException(Constants.ioExcepMess, excep);
+            throw new SAXException(Constants.MESS_IO_EXCEP, excep);
         }
         this.inExample = false;
     }
@@ -391,7 +395,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
             this.appendixGenerator.startExample(getLabel(attrs),
                     getNumber(attrs));
         } catch (final IOException excep) {
-            throw new SAXException(Constants.ioExcepMess, excep);
+            throw new SAXException(Constants.MESS_IO_EXCEP, excep);
         }
     }
 
@@ -399,7 +403,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
         try {
             this.appendixGenerator.endExample();
         } catch (final IOException excep) {
-            throw new SAXException(Constants.ioExcepMess, excep);
+            throw new SAXException(Constants.MESS_IO_EXCEP, excep);
         }
         this.inAppendix = false;
     }
@@ -409,7 +413,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
         try {
             generator.outputEleStart(this.currEleName, attrs, namespaces);
         } catch (final IOException excep) {
-            throw new SAXException(Constants.ioExcepMess, excep);
+            throw new SAXException(Constants.MESS_IO_EXCEP, excep);
         }
     }
 
@@ -418,7 +422,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
             generator.outputEleEnd(this.currEleName,
                     this.charBuff.voidBuffer());
         } catch (final IOException excep) {
-            throw new SAXException(Constants.ioExcepMess, excep);
+            throw new SAXException(Constants.MESS_IO_EXCEP, excep);
         }
     }
 
@@ -433,7 +437,7 @@ public final class MetsProfileXmlHandler extends DefaultHandler {
                 this.exampleHandlers.put(section, gene);
             }
         } catch (final IOException e) {
-            throw new SAXException(String.format(Constants.sectIoMess, section.sectName),
+            throw new SAXException(String.format(Constants.SECTION_MESS, section.sectName),
                     e);
         }
         this.currentSect = section;

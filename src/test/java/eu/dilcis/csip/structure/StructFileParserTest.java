@@ -7,24 +7,37 @@ import static org.junit.Assert.assertTrue;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
 
+import eu.dilcis.csip.profile.MetsProfile;
+import eu.dilcis.csip.profile.MetsProfileParser;
 import eu.dilcis.csip.profile.Profiles;
-import eu.dilcis.csip.profile.Requirement;
 import eu.dilcis.csip.structure.SpecificationStructure.Section;
 import eu.dilcis.csip.structure.SpecificationStructure.Table;
 
-
 public class StructFileParserTest {
-    private static final List<Requirement> requirements = new ArrayList<>();
+    private static MetsProfileParser profileParser = MetsProfileParser.newInstance();
+    private static MetsProfile csipProfile;
+    private static MetsProfile geoProfile;
     private static final Path STRUCT_ROOT = Path
             .of(ClassLoader.getSystemResource("eu/dilcis/csip/structure/").getPath());
-    private StructFileParser parser = StructFileParser.parserInstance(requirements);
+    private static StructFileParser parser;
+
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        csipProfile = profileParser.processXmlProfile(
+                Paths.get(ClassLoader.getSystemResource("eu/dilcis/csip/structure/profile/oldCSIP.xml").getPath()));
+        geoProfile = profileParser.processXmlProfile(
+                Paths.get(ClassLoader.getSystemResource("eu/dilcis/csip/structure/profile/oldGeo.xml").getPath()));
+        parser = StructFileParser.parserInstance(Arrays.asList(new MetsProfile[] { csipProfile }));
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void testFromNullYamlStream() throws ParseException {
@@ -142,15 +155,26 @@ public class StructFileParserTest {
         parser.fromYamlStream(is, STRUCT_ROOT);
     }
 
+    @Test(expected = ParseException.class)
+    public void testTableFromYamlStreamNoPath() throws ParseException {
+        InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/table_no_path.yaml");
+        parser.fromYamlStream(is, STRUCT_ROOT);
+    }
+
+    @Test(expected = ParseException.class)
+    public void testTableFromYamlStreamDirPath() throws ParseException {
+        InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/table_dir_path.yaml");
+        parser.fromYamlStream(is, STRUCT_ROOT);
+    }
+
     @Test
     public void testTableFromSource() throws ParseException {
         InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/table.yaml");
         final List<Map<String, Object>> mapList = new Yaml().load(is);
-        
-        Table table = parser.tableFromMap((String) mapList.get(0).get("name"), mapList.get(0));
+
+        Table table = StructFileParser.tableFromMap(Path.of("."), (String) mapList.get(0).get("name"), mapList.get(0));
         assertNotNull(table);
         assertEquals("requirements.METS.package", table.name);
-        assertTrue(Files.isRegularFile(table.source));
         assertEquals("Table should have 6 requirments.", 6, table.requirements.size());
         assert table.requirements.contains(Profiles.requirementIdFromString("GEO_3"));
         assert table.requirements.contains(Profiles.requirementIdFromString("GEO_4"));
@@ -168,6 +192,21 @@ public class StructFileParserTest {
             assertNotNull(section.name);
             assertNotNull(section.source);
             assertNotNull(section.type);
+        }
+    }
+
+    @Test
+    public void testTableGenerator() throws ParseException {
+        InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/struct_test.yaml");
+        SpecificationStructure structure = parser.fromYamlStream(is, STRUCT_ROOT);
+        for (SpecificationStructure.Section section : structure.sections) {
+            if (section instanceof Table) {
+                Table table = (Table) section;
+                String html = SpecificationStructure.htmlTable(table, Arrays.asList(new MetsProfile[] { geoProfile }));
+                assertNotNull(html);
+                assertTrue(html.contains("<table>"));
+                assertTrue(html.contains("</table>"));
+            }
         }
     }
 }

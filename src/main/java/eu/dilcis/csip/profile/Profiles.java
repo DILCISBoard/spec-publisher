@@ -7,6 +7,10 @@ public class Profiles {
         return RequirementId.fromIdString(idString);
     }
 
+    public static final MetsProfileParser metsProfileParser() {
+        return MetsProfileParser.getInstance();
+    }
+
     private Profiles() {
         throw new UnsupportedOperationException("Utility class");
     }

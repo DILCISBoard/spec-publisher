@@ -1,10 +1,6 @@
 package eu.dilcis.csip.profile;
 
 public class XmlConstants {
-    private XmlConstants() {
-        // private constructor to prevent instantiation
-    }
-
     static final String HEAD_ELE = "head"; //$NON-NLS-1$
     static final String APPENDIX_ELE = "Appendix"; //$NON-NLS-1$
     static final String CONTEXT_ELE = "context"; //$NON-NLS-1$
@@ -24,5 +20,12 @@ public class XmlConstants {
     static final String DEFTERM_ELE = "dt"; //$NON-NLS-1$
     static final String DEFDEF_ELE = "dd"; //$NON-NLS-1$
     static final String XML_PROC_INSTR = "<?xml version='1.0' encoding='UTF-8'?>"; //$NON-NLS-1$
-    static final String XML_EXTENSION = Constants.period + "xml"; //$NON-NLS-1$
+    static final String XML_EXTENSION = Constants.PERIOD + "xml"; //$NON-NLS-1$
+    static final String REQUIREMENT_ELE = "requirement"; //$NON-NLS-1$
+    static final String TITLE_ELE = "title"; //$NON-NLS-1$
+
+    private XmlConstants() {
+        // private constructor to prevent instantiation
+    }
+
 }

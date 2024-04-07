@@ -52,8 +52,7 @@ public final class Requirement {
          */
         @Override
         public String toString() {
-            return "RequirementId [prefix=" + this.prefix + ", number=" //$NON-NLS-1$ //$NON-NLS-2$
-                    + this.number + ", suffix=" + suffix + "]"; //$NON-NLS-1$
+            return this.prefix + this.number + this.suffix; // $NON-NLS-1$
         }
 
         @Override
@@ -87,16 +86,19 @@ public final class Requirement {
     }
 
     public static final class Details {
-        static Details fromValues(final String name, final Level level) {
-            return new Details(name, level);
+        static Details fromValues(final String name, final Section section, final Level level) {
+            return new Details(name, section, level);
         }
 
         public final String name;
 
         public final Level level;
 
-        private Details(final String name, final Level level) {
+        public final Section section;
+
+        private Details(final String name, final Section section, final Level level) {
             this.name = name;
+            this.section = section;
             this.level = level;
         }
 
@@ -114,7 +116,7 @@ public final class Requirement {
 
         @Override
         public int hashCode() {
-            return Objects.hash(name, level);
+            return Objects.hash(name, section, level);
         }
 
         @Override
@@ -124,7 +126,7 @@ public final class Requirement {
             if (!(obj instanceof Details))
                 return false;
             final Details other = (Details) obj;
-            return Objects.equals(name, other.name) && level == other.level;
+            return Objects.equals(name, other.name) && level == other.level && section == other.section;
         }
 
     }
@@ -145,9 +147,10 @@ public final class Requirement {
     }
 
     static class Builder {
-        private Requirement.RequirementId id;
+        private RequirementId id;
         private String name;
         private Level level;
+        private Section section;
         private String relMat;
         private List<String> description;
         private List<String> examples;
@@ -159,7 +162,7 @@ public final class Requirement {
             this(Requirement.DEFAULT);
         }
 
-        public Builder(final Requirement.Builder builder) {
+        public Builder(final Builder builder) {
             this(builder.build());
         }
 
@@ -167,6 +170,7 @@ public final class Requirement {
             super();
             this.id = req.id;
             this.name = req.details.name;
+            this.section = req.details.section;
             this.level = req.details.level;
             this.relMat = req.relMat;
             this.description = new ArrayList<>(req.description);
@@ -175,11 +179,11 @@ public final class Requirement {
             this.cardinality = req.cardinality;
         }
 
-        public Requirement.Builder processAttr(final String attName,
+        public Builder processAttr(final String attName,
                 final String attValue) {
             switch (attName) {
                 case "ID": //$NON-NLS-1$
-                    this.id(Requirement.RequirementId.fromIdString(attValue));
+                    this.id(RequirementId.fromIdString(attValue));
                     break;
 
                 case "REQLEVEL": //$NON-NLS-1$
@@ -206,7 +210,7 @@ public final class Requirement {
          * @param id
          *           the id to set
          */
-        public Requirement.Builder id(final Requirement.RequirementId iD) {
+        public Builder id(final RequirementId iD) {
             this.id = iD;
             return this;
         }
@@ -215,8 +219,17 @@ public final class Requirement {
          * @param name
          *             the name to set
          */
-        public Requirement.Builder name(final String nm) {
+        public Builder name(final String nm) {
             this.name = nm;
+            return this;
+        }
+
+        /**
+         * @param section
+         *                the section to set
+         */
+        public Builder section(final Section section) {
+            this.section = section;
             return this;
         }
 
@@ -224,7 +237,7 @@ public final class Requirement {
          * @param level
          *              the reqLevel to set
          */
-        public Requirement.Builder relMat(final String rlMt) {
+        public Builder relMat(final String rlMt) {
             this.relMat = rlMt;
             return this;
         }
@@ -233,12 +246,12 @@ public final class Requirement {
          * @param level
          *              the reqLevel to set
          */
-        public Requirement.Builder reqLevel(final Level level) {
+        public Builder reqLevel(final Level level) {
             this.level = level;
             return this;
         }
 
-        public Requirement.Builder descPart(final String part) {
+        public Builder descPart(final String part) {
             this.descParts += part;
             return this;
         }
@@ -247,7 +260,7 @@ public final class Requirement {
          * @param description
          *                    the description to set
          */
-        public Requirement.Builder description(final String dscrptn) {
+        public Builder description(final String dscrptn) {
             if (dscrptn == null || dscrptn.isEmpty())
                 return this;
             this.description.add(this.descParts + dscrptn);
@@ -259,7 +272,7 @@ public final class Requirement {
          * @param description
          *                    the description to set
          */
-        public Requirement.Builder descriptions(final List<String> dscrptns) {
+        public Builder descriptions(final List<String> dscrptns) {
             this.description = new ArrayList<>(dscrptns);
             return this;
         }
@@ -268,7 +281,7 @@ public final class Requirement {
          * @param examples
          *                 the examples to set
          */
-        public Requirement.Builder examples(final List<String> xmpls) {
+        public Builder examples(final List<String> xmpls) {
             this.examples = new ArrayList<>(xmpls);
             return this;
         }
@@ -277,7 +290,7 @@ public final class Requirement {
          * @param example
          *                the example to add
          */
-        public Requirement.Builder example(final String xmpl) {
+        public Builder example(final String xmpl) {
             this.examples.add(xmpl);
             return this;
         }
@@ -286,7 +299,7 @@ public final class Requirement {
          * @param xPath
          *              the xPath to set
          */
-        public Requirement.Builder defPair(final String term, final String def) {
+        public Builder defPair(final String term, final String def) {
             switch (term) {
                 case Constants.XPATH_TERM:
                     return this.xPath(def);
@@ -302,7 +315,7 @@ public final class Requirement {
          * @param xPath
          *              the xPath to set
          */
-        public Requirement.Builder xPath(final String xPth) {
+        public Builder xPath(final String xPth) {
             this.xPath = xPth;
             return this;
         }
@@ -311,7 +324,7 @@ public final class Requirement {
          * @param cardinality
          *                    the cardinality to set
          */
-        public Requirement.Builder cardinality(final String crdnlty) {
+        public Builder cardinality(final String crdnlty) {
             this.cardinality = crdnlty;
             return this;
         }
@@ -320,7 +333,7 @@ public final class Requirement {
             if (this.descParts.length() > 0) {
                 this.description.add(this.descParts);
             }
-            return new Requirement(this.id, new Details(this.name, this.level),
+            return new Requirement(this.id, new Details(this.name, this.section, this.level),
                     this.relMat, this.description, this.examples, this.xPath,
                     this.cardinality);
         }
@@ -328,11 +341,7 @@ public final class Requirement {
 
     public static final Requirement DEFAULT = new Requirement();
 
-    static boolean isRequirementEle(final String eleName) {
-        return Constants.REQUIREMENT.equals(eleName);
-    }
-
-    public final Requirement.RequirementId id;
+    public final RequirementId id;
     public final Details details;
     final String relMat;
     public final List<String> description;
@@ -340,7 +349,7 @@ public final class Requirement {
     public final String xPath;
     public final String cardinality;
 
-    Requirement(final Requirement.RequirementId id, final Details details, final String relMat,
+    Requirement(final RequirementId id, final Details details, final String relMat,
             final List<String> description, final List<String> examples,
             final String xPath, final String cardinality) {
         super();
@@ -354,12 +363,12 @@ public final class Requirement {
     }
 
     private Requirement() {
-        this(Requirement.RequirementId.DEFAULT_ID, new Details(Constants.EMPTY,
+        this(RequirementId.DEFAULT_ID, new Details(Constants.EMPTY, Section.ROOT,
                 Level.MAY), Constants.EMPTY, Collections.emptyList(),
                 Collections.emptyList(), Constants.EMPTY, Constants.EMPTY);
     }
 
-    public Requirement.RequirementId getId() {
+    public RequirementId getId() {
         return this.id;
     }
 
