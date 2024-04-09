@@ -42,16 +42,21 @@ public final class MetsProfileParser extends DefaultHandler {
             throw new IllegalStateException(Constants.INIT_SAX_MESS, excep);
         }
     }
+
     public static final MetsProfileParser newInstance() {
         return new MetsProfileParser();
     }
+
     static final MetsProfileParser getInstance() {
         return new MetsProfileParser();
     }
+
     private final XmlCharBuffer charBuff = new XmlCharBuffer();
-    private String currEleName;
+    private String currentElementName;
     private boolean inRequirement = false;
     private boolean inExtSchema = false;
+    private boolean inVocab = false;
+    private boolean inTool = false;
     private String currDefTerm = null;
     private NamespaceSupport namespaces = new NamespaceSupport();
     private Requirement.Builder reqBuilder = new Requirement.Builder();
@@ -103,16 +108,20 @@ public final class MetsProfileParser extends DefaultHandler {
             namespaces.pushContext();
         needNewContext = true;
         // Get the current ele name
-        this.currEleName = qName;
-        if (XmlConstants.REQUIREMENT_ELE.equals(this.currEleName)) {
+        this.currentElementName = qName;
+        if (XmlConstants.REQUIREMENT_ELE.equals(this.currentElementName)) {
             this.processRequirementAttrs(attrs);
         } else if (this.inRequirement) {
             this.processRequirementChildStart(attrs);
-        } else if (Section.isSection(this.currEleName)) {
+        } else if (Section.isSection(this.currentElementName)) {
             this.startSection();
-        } else if (XmlConstants.EXTSCHEMA_ELE.equals(this.currEleName)) {
+        } else if (XmlConstants.EXTSCHEMA_ELE.equals(this.currentElementName)) {
             this.inExtSchema = true;
             this.schemaBuilder = new ExternalSchema.Builder();
+        } else if (XmlConstants.VOCAB_ELE.equals(this.currentElementName)) {
+            this.inVocab = true;
+        } else if (XmlConstants.TOOL_ELE.equals(this.currentElementName)) {
+            this.inTool = true;
         }
         this.charBuff.voidBuffer();
     }
@@ -120,23 +129,27 @@ public final class MetsProfileParser extends DefaultHandler {
     @Override
     public void endElement(final String namespaceURI, final String sName, // simple name
             final String qName) {
-        this.currEleName = qName;
-        if (XmlConstants.REQUIREMENT_ELE.equals(this.currEleName)) {
+        this.currentElementName = qName;
+        if (XmlConstants.REQUIREMENT_ELE.equals(this.currentElementName)) {
             this.processRequirementEle();
         } else if (this.inRequirement) {
             this.processRequirementChild();
-        } else if (XmlConstants.EXTSCHEMA_ELE.equals(this.currEleName)) {
+        } else if (XmlConstants.EXTSCHEMA_ELE.equals(this.currentElementName)) {
             this.inExtSchema = false;
             this.schemaBuilder.build();
+        } else if (XmlConstants.VOCAB_ELE.equals(this.currentElementName)) {
+            this.inVocab = false;
+        } else if (XmlConstants.TOOL_ELE.equals(this.currentElementName)) {
+            this.inTool = false;
         } else if (this.inExtSchema) {
             this.processSchemaEle();
-        } else if (XmlConstants.URI_ELE.equals(this.currEleName)) {
+        } else if (XmlConstants.URI_ELE.equals(this.currentElementName) && !(this.inVocab || this.inTool)) {
             this.profileUri = URI.create(this.charBuff.getBufferValue());
-        } else if (XmlConstants.TITLE_ELE.equals(this.currEleName)) {
+        } else if (XmlConstants.TITLE_ELE.equals(this.currentElementName)) {
             this.profileTitle = this.charBuff.getBufferValue();
         }
         this.charBuff.voidBuffer();
-        this.currEleName = null;
+        this.currentElementName = null;
     }
 
     @Override
@@ -192,7 +205,7 @@ public final class MetsProfileParser extends DefaultHandler {
     }
 
     private void processRequirementChildStart(final Attributes eleAtts) {
-        if (XmlConstants.ANCHOR_ELE.equals(this.currEleName)) {
+        if (XmlConstants.ANCHOR_ELE.equals(this.currentElementName)) {
             this.reqBuilder.descPart(this.charBuff.getBufferValue());
             this.currentHref = this.getHref(eleAtts);
         }
@@ -210,7 +223,7 @@ public final class MetsProfileParser extends DefaultHandler {
     }
 
     private void processRequirementChild() {
-        switch (this.currEleName) {
+        switch (this.currentElementName) {
             case XmlConstants.HEAD_ELE:
                 this.reqBuilder.name(this.charBuff.getBufferValue());
                 break;
@@ -234,7 +247,7 @@ public final class MetsProfileParser extends DefaultHandler {
     }
 
     private void processSchemaEle() {
-        switch (this.currEleName) {
+        switch (this.currentElementName) {
             case XmlConstants.NAME_ELE:
                 this.schemaBuilder.name(this.charBuff.getBufferValue());
                 break;
@@ -253,6 +266,6 @@ public final class MetsProfileParser extends DefaultHandler {
     }
 
     private void startSection() {
-        this.currentSect = Section.fromEleName(this.currEleName);
+        this.currentSect = Section.fromEleName(this.currentElementName);
     }
 }

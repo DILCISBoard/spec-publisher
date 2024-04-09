@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,11 +15,13 @@ import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.xml.sax.SAXException;
 import org.yaml.snakeyaml.Yaml;
 
 import eu.dilcis.csip.profile.MetsProfile;
 import eu.dilcis.csip.profile.MetsProfileParser;
 import eu.dilcis.csip.profile.Profiles;
+import eu.dilcis.csip.structure.SpecificationStructure.Part;
 import eu.dilcis.csip.structure.SpecificationStructure.Section;
 import eu.dilcis.csip.structure.SpecificationStructure.Table;
 
@@ -31,7 +34,7 @@ public class StructFileParserTest {
     private static StructFileParser parser;
 
     @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
+    public static void setUpBeforeClass() throws SAXException, IOException {
         csipProfile = profileParser.processXmlProfile(
                 Paths.get(ClassLoader.getSystemResource("eu/dilcis/csip/structure/profile/oldCSIP.xml").getPath()));
         geoProfile = profileParser.processXmlProfile(
@@ -112,8 +115,8 @@ public class StructFileParserTest {
         InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/section.yaml");
         SpecificationStructure structure = parser.fromYamlStream(is, STRUCT_ROOT);
         assertNotNull(structure);
-        assertEquals("Parsed Structure should have 1 section", 1, structure.sections.size());
-        Section section = structure.sections.get(0);
+        assertEquals("Parsed Structure should have 1 section", 1, structure.content.size());
+        Section section = structure.content.get(Part.BODY).get(0);
         assertNotNull(section);
         assertEquals("context", section.name);
         assertTrue(Files.isRegularFile(section.source));
@@ -186,8 +189,8 @@ public class StructFileParserTest {
         InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/struct_test.yaml");
         SpecificationStructure structure = parser.fromYamlStream(is, STRUCT_ROOT);
         assertNotNull(structure);
-        assertEquals("Parsed Structure should have 6 sections", 6, structure.sections.size());
-        for (SpecificationStructure.Section section : structure.sections) {
+        assertEquals("Parsed Structure should have 6 sections", 6, structure.content.get(Part.BODY).size());
+        for (SpecificationStructure.Section section : structure.content.get(Part.BODY)) {
             assertNotNull(section);
             assertNotNull(section.name);
             assertNotNull(section.source);
@@ -196,10 +199,10 @@ public class StructFileParserTest {
     }
 
     @Test
-    public void testTableGenerator() throws ParseException {
+    public void testTableGenerator() throws ParseException, IOException {
         InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/struct_test.yaml");
         SpecificationStructure structure = parser.fromYamlStream(is, STRUCT_ROOT);
-        for (SpecificationStructure.Section section : structure.sections) {
+        for (SpecificationStructure.Section section : structure.content.get(Part.BODY)) {
             if (section instanceof Table) {
                 Table table = (Table) section;
                 String html = SpecificationStructure.htmlTable(table, Arrays.asList(new MetsProfile[] { geoProfile }));

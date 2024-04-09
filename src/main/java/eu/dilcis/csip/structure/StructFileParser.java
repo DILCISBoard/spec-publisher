@@ -8,8 +8,10 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,6 +21,7 @@ import org.yaml.snakeyaml.Yaml;
 import eu.dilcis.csip.profile.MetsProfile;
 import eu.dilcis.csip.profile.Profiles;
 import eu.dilcis.csip.profile.Requirement.RequirementId;
+import eu.dilcis.csip.structure.SpecificationStructure.Part;
 import eu.dilcis.csip.structure.SpecificationStructure.Section;
 import eu.dilcis.csip.structure.SpecificationStructure.SourceType;
 import eu.dilcis.csip.structure.SpecificationStructure.Table;
@@ -101,8 +104,12 @@ public final class StructFileParser {
         if (!Files.exists(source) || Files.isDirectory(source)) {
             throw new IllegalArgumentException("File does not exist, or is a directory: " + source);
         }
-        this.root = source.getParent();
+        this.root = source.toFile().getParentFile().toPath();
         return this.fromSource(source);
+    }
+
+    public List<MetsProfile> getProfiles() {
+        return new ArrayList<>(this.profiles.values());
     }
 
     SpecificationStructure fromYamlStream(final InputStream source, final Path root) throws ParseException {
@@ -113,11 +120,15 @@ public final class StructFileParser {
             throw new IllegalArgumentException("Parameter root is null, or is not an existing directory.");
         }
         this.root = root;
-        final List<SpecificationStructure.Section> sections = new ArrayList<>();
-        for (final Map<String, Object> entryMap : this.parseYamlStream(source)) {
-            sections.add(this.sectionFromMapEntry(entryMap));
+        final Map<Part, List<SpecificationStructure.Section>> content = new EnumMap<>(Part.class);
+        for (final Entry<String, List<Map<String, Object>>> entryMap : this.parseYamlStream(source).entrySet()) {
+            final List<Section> sections = new ArrayList<>();
+            for (final Map<String, Object> entry : entryMap.getValue()) {
+                sections.add(this.sectionFromMapEntry(entry));
+            }
+            content.put(Part.fromString(entryMap.getKey()), sections);
         }
-        return SpecificationStructure.fromSections(sections);
+        return SpecificationStructure.fromContentMap(content);
     }
 
     private Section sectionFromMap(final String name, final SourceType type, final Map<String, Object> entryMap)
@@ -153,9 +164,9 @@ public final class StructFileParser {
         return this.sectionFromMap(name, type, entryMap);
     }
 
-    private List<Map<String, Object>> parseYamlStream(final InputStream source) throws ParseException {
+    private Map<String, List<Map<String, Object>>> parseYamlStream(final InputStream source) throws ParseException {
         try {
-            final List<Map<String, Object>> mapList = new Yaml().load(source);
+            final Map<String, List<Map<String, Object>>> mapList = new Yaml().load(source);
             if (mapList == null || mapList.isEmpty()) {
                 throw new ParseException("No entries found in source Stream.");
             }

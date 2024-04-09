@@ -23,6 +23,7 @@ public class XmlConstants {
     static final String XML_EXTENSION = Constants.PERIOD + "xml"; //$NON-NLS-1$
     static final String REQUIREMENT_ELE = "requirement"; //$NON-NLS-1$
     static final String TITLE_ELE = "title"; //$NON-NLS-1$
+    static final String TOOL_ELE = "tool"; //$NON-NLS-1$
 
     private XmlConstants() {
         // private constructor to prevent instantiation

@@ -9,7 +9,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.github.mustachejava.DefaultMustacheFactory;
@@ -21,7 +23,7 @@ import eu.dilcis.csip.profile.Requirement;
 import eu.dilcis.csip.profile.Requirement.RequirementId;
 
 public final class SpecificationStructure {
-    static class Section {
+    public static class Section {
         public final String name;
         public final Path source;
         public final SourceType type;
@@ -32,6 +34,36 @@ public final class SpecificationStructure {
             this.source = source;
             this.type = type;
         }
+
+        @Override
+        public final int hashCode() {
+            return Objects.hash(name, source, type);
+        }
+
+        @Override
+        public final boolean equals(final Object obj) {
+            if (this == obj)
+                return true;
+            if (!(obj instanceof Section))
+                return false;
+            final Section other = (Section) obj;
+            return Objects.equals(name, other.name) && Objects.equals(source, other.source) && type == other.type;
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder();
+            builder.append("Section [");
+            if (name != null)
+                builder.append("name=").append(name).append(", ");
+            if (source != null)
+                builder.append("source=").append(source).append(", ");
+            if (type != null)
+                builder.append("type=").append(type);
+            builder.append("]");
+            return builder.toString();
+        }
+
     }
 
     static final class Table extends Section {
@@ -48,6 +80,24 @@ public final class SpecificationStructure {
             super(name, source, type);
             this.caption = caption;
             this.requirements = Collections.unmodifiableList(requirements);
+        }
+
+        @Override
+        public String toString() {
+            final StringBuilder builder = new StringBuilder();
+            builder.append("Table [");
+            if (name != null)
+                builder.append("name=").append(name).append(", ");
+            if (source != null)
+                builder.append("source=").append(source).append(", ");
+            if (type != null)
+                builder.append("type=").append(type).append(", ");
+            if (caption != null)
+                builder.append("caption=").append(caption).append(", ");
+            if (requirements != null)
+                builder.append("requirements=").append(requirements);
+            builder.append("]");
+            return builder.toString();
         }
     }
 
@@ -70,21 +120,43 @@ public final class SpecificationStructure {
         }
     }
 
-    static Path tableToFile(final Table table, final Collection<MetsProfile> profiles, final String template) throws IOException {
-        serialiseTable(table, profiles, template, new FileWriter(table.source.toFile()));
+    public enum Part {
+        PREFACE, BODY, APPENDICES, POSTFACE;
+
+        static final Part fromString(final String partName) throws ParseException {
+            if (partName != null) {
+                for (final Part part : Part.values()) {
+                    if (part.name().equalsIgnoreCase(partName)) {
+                        return part;
+                    }
+                }
+            }
+            throw new ParseException("Invalid part: " + partName);
+        }
+
+        public String getFileName() {
+            return this.name().toLowerCase() + ".md";
+        }
+    }
+
+    static Path tableToFile(final Table table, final Collection<MetsProfile> profiles, final String template)
+            throws IOException {
+        try (Writer writer = new FileWriter(table.source.toFile())) {
+            serialiseTable(table, profiles, template, writer);
+        }
         return table.source;
     }
 
-    static String htmlTable(final Table table, final Collection<MetsProfile> profiles) {
+    static String htmlTable(final Table table, final Collection<MetsProfile> profiles) throws IOException {
         return tableStringFromTemplate(table, profiles, "eu/dilcis/csip/out/table.mustache");
     }
 
-    static String markdownTable(final Table table, final Collection<MetsProfile> profiles) {
+    static String markdownTable(final Table table, final Collection<MetsProfile> profiles) throws IOException {
         return tableStringFromTemplate(table, profiles, "eu/dilcis/csip/out/table_markdown.mustache");
     }
 
     static final void serialiseTable(final Table table, final Collection<MetsProfile> profiles, final String template,
-            final Writer destination) {
+            final Writer destination) throws IOException {
         final List<Requirement> requirements = profiles.stream().flatMap(p -> p.getRequirements().stream())
                 .filter(r -> table.requirements.contains(r.id)).collect(Collectors.toList());
         if (requirements.size() != table.requirements.size()) {
@@ -93,7 +165,7 @@ public final class SpecificationStructure {
         final MustacheFactory mf = new DefaultMustacheFactory();
         final Mustache m = mf.compile(template);
         final Map<String, Object> context = Map.of("requirements", requirements, "caption", table.caption);
-        m.execute(destination, context);
+        m.execute(destination, context).flush();
     }
 
     static final Table tableFromValues(final String name, final Path source, final String caption,
@@ -109,20 +181,70 @@ public final class SpecificationStructure {
         return new Section(name, source, type);
     }
 
-    static final SpecificationStructure fromSections(final List<Section> sections) {
-        return new SpecificationStructure(sections);
+    static final SpecificationStructure fromContentMap(final Map<Part, List<Section>> content) {
+        return new SpecificationStructure(content);
     }
 
-    private static String tableStringFromTemplate(final Table table, final Collection<MetsProfile> profiles, final String template) {
-        final StringWriter writer = new StringWriter();
-        serialiseTable(table, profiles, template, writer);
-        return writer.toString();
+    private static String tableStringFromTemplate(final Table table, final Collection<MetsProfile> profiles,
+            final String template) throws IOException {
+        try (final StringWriter writer = new StringWriter()) {
+            serialiseTable(table, profiles, template, writer);
+            return writer.toString();
+        }
     }
 
-    public final List<Section> sections;
+    public final Map<Part, List<Section>> content;
 
-    private SpecificationStructure(final List<Section> sections) {
+    private SpecificationStructure(final Map<Part, List<Section>> content) {
         super();
-        this.sections = Collections.unmodifiableList(sections);
+        this.content = Collections.unmodifiableMap(content);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("SpecificationStructure [");
+        if (content != null)
+            builder.append("sections=").append(content);
+        builder.append("]");
+        return builder.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(content);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (!(obj instanceof SpecificationStructure))
+            return false;
+        final SpecificationStructure other = (SpecificationStructure) obj;
+        return Objects.equals(content, other.content);
+    }
+
+    public void serialiseSiteStructure(final Collection<MetsProfile> profiles) {
+        serialiseStructure(profiles, "eu/dilcis/csip/out/table_markdown.mustache");
+    }
+
+    public void serialisePdfStructure(final Collection<MetsProfile> profiles) {
+        serialiseStructure(profiles, "eu/dilcis/csip/out/table_pdf.mustache");
+    }
+
+    private void serialiseStructure(final Collection<MetsProfile> profiles, final String template) {
+        for (Entry<Part, List<Section>> entry : content.entrySet()) {
+            for (final Section section : entry.getValue()) {
+                if (section instanceof Table) {
+                    final Table table = (Table) section;
+                    try {
+                        tableToFile(table, profiles, template);
+                    } catch (final IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 }

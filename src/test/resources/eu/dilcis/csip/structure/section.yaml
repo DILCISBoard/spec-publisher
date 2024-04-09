@@ -1,5 +1,6 @@
 ---
-- name: context
-  type: markdown
-  path: context/index.md
+body:
+  - name: context
+    type: markdown
+    path: context/index.md
 

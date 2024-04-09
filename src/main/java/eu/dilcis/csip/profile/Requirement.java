@@ -154,7 +154,7 @@ public final class Requirement {
         private String relMat;
         private List<String> description;
         private List<String> examples;
-        private String xPath;
+        private String xPath = "N/A";
         private String cardinality;
         private String descParts = "";
 

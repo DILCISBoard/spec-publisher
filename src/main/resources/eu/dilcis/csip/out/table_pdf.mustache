@@ -1,0 +1,6 @@
+{{=<% %>=}}
+|  ID     | Name, Location & Description | Card & Level |
+| ------- | ---------------------------- | ------------ |
+<%#requirements%>
+| <a name="<% id %>"/>**<% id %>** | \vtop{\hbox{\strut \textbf{<% details.name %>}}\hbox{\strut \small \texttt{<%#xPath%><% xPath %><%/xPath%><%^xPath%>N/A<%/xPath%>}}}<%#description%><% . %><br/><%/description%> | \vtop{\hbox{\strut \textbf{<% cardinality %>}}\hbox{\strut <% details.level %>}} |
+<%/requirements%>

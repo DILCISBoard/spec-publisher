@@ -1,9 +1,14 @@
 package eu.dilcis.csip;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
 import org.xml.sax.SAXException;
@@ -12,6 +17,8 @@ import eu.dilcis.csip.profile.MetsProfile;
 import eu.dilcis.csip.profile.MetsProfileParser;
 import eu.dilcis.csip.structure.ParseException;
 import eu.dilcis.csip.structure.SpecificationStructure;
+import eu.dilcis.csip.structure.SpecificationStructure.Part;
+import eu.dilcis.csip.structure.SpecificationStructure.Section;
 import eu.dilcis.csip.structure.StructFileParser;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -49,12 +56,58 @@ public final class MetsProfileProcessor implements Callable<Integer> {
             "--file" }, required = true, paramLabel = "SPECIFICATION", description = "A YAML file that describes the specification structure.")
     private File structureFile;
 
+    @Option(names = { "-o",
+            "--output" }, defaultValue = "./site", paramLabel = "OUTPUT", description = "A directory to hold the collatoral produced.")
+    private Path destination;
+
     @Override
     public Integer call() {
         int result = 0;
+        if (this.destination.toFile().exists() && !this.destination.toFile().isDirectory()) {
+            System.err.println("Destination must be a directory.");
+            return 1;
+        } else if (!this.destination.toFile().exists() && !this.destination.toFile().mkdirs()) {
+            System.err.println("Failed to create destination directory.");
+            return 1;
+        }
+
         try {
             final StructFileParser structParser = StructFileParser.parserInstance(this.processProfiles());
             final SpecificationStructure specStructure = structParser.parseStructureFile(this.structureFile.toPath());
+            specStructure.serialiseSiteStructure(structParser.getProfiles());
+            for (Entry<Part, List<Section>> entry : specStructure.content.entrySet()) {
+                try (Writer writer = new FileWriter(this.destination.resolve(entry.getKey().getFileName()).toFile())) {
+                    if (Part.BODY.equals(entry.getKey())) {
+                        writer.write("!TOC\n\n");
+                    }
+                    for (Section section : entry.getValue()) {
+                        try (FileReader reader = new FileReader(section.source.toFile())) {
+                            reader.transferTo(writer);
+                        }
+                        writer.write("\n");
+                    }
+                    if (Part.BODY.equals(entry.getKey())) {
+                        writer.write("!INCLUDE \"appendices.md\"\n");
+                    }
+                    writer.flush();
+                }
+            }
+            specStructure.serialisePdfStructure(structParser.getProfiles());
+            for (Entry<Part, List<Section>> entry : specStructure.content.entrySet()) {
+                try (Writer writer = new FileWriter(
+                        this.destination.resolve("../pdf").resolve(entry.getKey().getFileName()).toFile())) {
+                    for (Section section : entry.getValue()) {
+                        try (FileReader reader = new FileReader(section.source.toFile())) {
+                            reader.transferTo(writer);
+                        }
+                        writer.write("\n");
+                    }
+                    if (Part.BODY.equals(entry.getKey())) {
+                        writer.write("!INCLUDE \"appendices.md\"\n");
+                    }
+                    writer.flush();
+                }
+            }
         } catch (SAXException | IOException excep) {
             // Basic for now, print the stack trace and trhow it
             excep.printStackTrace();
