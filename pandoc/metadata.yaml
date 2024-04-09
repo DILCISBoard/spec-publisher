@@ -7,12 +7,12 @@ titlepage-color: "186b9e"
 titlepage-text-color: "3adeca"
 titlepage-rule-color: "3adeca"
 titlepage-rule-height: 1
-cofund:	"../spec-publisher/pandoc/img/cofund.jpg"
-logo:	"../spec-publisher/pandoc/img/DILCISlogo.png"
-dilcis-logo:	"../spec-publisher/pandoc/img/dilcis-logo.png"
-dlm-logo:	"../spec-publisher/pandoc/img/dlm-logo.png"
-eark-logo:	"../spec-publisher/pandoc/img/eark-logo.jpg"
-eu-logo:	"../spec-publisher/pandoc/img/eu-logo.png"
+cofund:	"./img/cofund.jpg"
+logo:	"./img/DILCISlogo.png"
+dilcis-logo:	"./img/dilcis-logo.png"
+dlm-logo:	"./img/dlm-logo.png"
+eark-logo:	"./img/eark-logo.jpg"
+eu-logo:	"./img/eu-logo.png"
 toc-title:	"Table of contents"
 header-right:	DILCIS Board
 autoSectionLabels: True
