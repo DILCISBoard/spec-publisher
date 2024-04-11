@@ -13,9 +13,9 @@
       <td><a name="{{ id }}">{{ id }}</a></td>
       <td>
         <strong>{{ details.name }}</strong><br/>
-        `{{ details.location }}`<br/>
+        {{#xPath}}`{{ xPath }}`{{/xPath}}{{^xPath}}`N/A`{{/xPath}}
         {{#description}}
-        {{.}}<br/>
+        <br/>{{.}}
         {{/description}}
       </td>
       <td>
