@@ -175,13 +175,27 @@ public class StructFileParserTest {
         InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/table.yaml");
         final List<Map<String, Object>> mapList = new Yaml().load(is);
 
-        Table table = StructFileParser.tableFromMap(Path.of("."), (String) mapList.get(0).get("name"), mapList.get(0));
+        Table table = StructFileParser.tableFromMap(Arrays.asList(new MetsProfile[] { csipProfile }), Path.of("."), (String) mapList.get(0).get("name"), mapList.get(0));
         assertNotNull(table);
         assertEquals("requirements.METS.package", table.name);
         assertEquals("Table should have 6 requirments.", 6, table.requirements.size());
         assert table.requirements.contains(Profiles.requirementIdFromString("GEO_3"));
         assert table.requirements.contains(Profiles.requirementIdFromString("GEO_4"));
         assert table.requirements.contains(Profiles.requirementIdFromString("GEO_6"));
+    }
+
+    @Test
+    public void testSectionTableFromSource() throws ParseException {
+        InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/table_mets_section.yaml");
+        final List<Map<String, Object>> mapList = new Yaml().load(is);
+
+        Table table = StructFileParser.tableFromMap(Arrays.asList(new MetsProfile[] { csipProfile }), Path.of("."), (String) mapList.get(0).get("name"), mapList.get(0));
+        assertNotNull(table);
+        assertEquals("requirements.METS.package", table.name);
+        assertEquals("Table should have 6 requirments.", 6, table.requirements.size());
+        assert table.requirements.contains(Profiles.requirementIdFromString("CSIP1"));
+        assert table.requirements.contains(Profiles.requirementIdFromString("CSIP3"));
+        assert table.requirements.contains(Profiles.requirementIdFromString("CSIP6"));
     }
 
     @Test

@@ -97,6 +97,10 @@ public final class Requirement {
         public final Section section;
 
         private Details(final String name, final Section section, final Level level) {
+            if (name == null)
+                throw new IllegalArgumentException("Name cannot be null.");
+            if (section == null)
+                throw new IllegalArgumentException("Section cannot be null.");
             this.name = name;
             this.section = section;
             this.level = level;

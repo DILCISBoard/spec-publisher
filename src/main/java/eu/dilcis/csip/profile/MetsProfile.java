@@ -48,8 +48,13 @@ public final class MetsProfile {
     }
 
     public final List<Requirement> getRequirementsBySection(final Section section) {
-        return orderedRequirements.stream().map(this.requirements::get).filter(r -> r.details.section.equals(section))
+        return orderedRequirements.stream().map(this.requirements::get).filter(r -> section.equals(r.details.section))
                 .collect(Collectors.toList());
+    }
+
+    public List<Section> getSections() {
+        return orderedRequirements.stream().map(this.requirements::get).map(r -> r.details.section)
+                .distinct().collect(Collectors.toList());
     }
 
     public final Requirement getRequirementById(final RequirementId id) {

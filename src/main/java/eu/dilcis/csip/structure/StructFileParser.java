@@ -31,7 +31,7 @@ public final class StructFileParser {
         return new StructFileParser(profiles);
     }
 
-    static Table tableFromMap(final Path root, final String name, final Map<String, Object> entryMap)
+    static Table tableFromMap(final Collection<MetsProfile> profiles, final Path root, final String name, final Map<String, Object> entryMap)
             throws ParseException {
         try {
             final String heading = stringFromMap(name, "heading", entryMap);
@@ -39,17 +39,28 @@ public final class StructFileParser {
             if (Files.isDirectory(path)) {
                 throw new ParseException("Target file is a directory: " + path + " for table: " + name);
             }
-            @SuppressWarnings("unchecked")
-            final List<String> reqIds = (List<String>) entryMap.get("requirements");
-            if (reqIds == null || reqIds.isEmpty()) {
-                throw new ParseException("No requirements found for table: " + name);
-            }
-            return SpecificationStructure.tableFromValues(name, path, heading, getRequirementIds(reqIds));
+            final List<RequirementId> reqIds = getRequirementIds(profiles, name, entryMap);
+            return SpecificationStructure.tableFromValues(name, path, heading, reqIds);
         } catch (final ClassCastException e) {
             throw new ParseException("Invalid key value for table: " + name, e);
         } catch (final NoSuchElementException e) {
             throw new ParseException("Not all requirements found in profiles for table: " + name, e);
         }
+    }
+
+    private static List<RequirementId> getRequirementIds(final Collection<MetsProfile> profiles, final String name, final Map<String, Object> entryMap) throws ParseException {
+        @SuppressWarnings("unchecked")
+        final List<String> reqIds = (List<String>) entryMap.get("requirements");
+        if (reqIds != null && !reqIds.isEmpty()) {
+            return getRequirementIds(reqIds);
+        }
+        final String sectionName = stringFromMap(name, "section", entryMap);
+        final eu.dilcis.csip.profile.Section section = eu.dilcis.csip.profile.Section.fromEleName(sectionName);
+        List<RequirementId> reqList = new ArrayList<>();
+        for (final MetsProfile profile : profiles) {
+            reqList.addAll(profile.getRequirementsBySection(section).stream().map(r -> r.id).collect(Collectors.toList()));
+        }
+        return reqList;
     }
 
     private static List<RequirementId> getRequirementIds(final List<String> reqIds) throws ParseException {
@@ -151,7 +162,7 @@ public final class StructFileParser {
             throw new ParseException("No type found for entry: " + name);
         }
         if (SourceType.TABLE.equals(type)) {
-            return tableFromMap(this.root, name, entryMap);
+            return tableFromMap(this.profiles.values(), this.root, name, entryMap);
         }
         if (SourceType.METS.equals(type)) {
             return this.sectionFromMetsMapEntry(name, type, entryMap);
