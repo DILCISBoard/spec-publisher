@@ -74,7 +74,8 @@ public final class SpecificationStructure {
         if (requirements.size() != table.requirements.size()) {
             throw new NoSuchElementException("Not all requirements found in profiles." + requirements);
         }
-        Utilities.serialiseToTemplate(template, Map.of("requirements", requirements, "caption", table.caption),
+        Utilities.serialiseToTemplate(template,
+                Map.of("requirements", requirements, "caption", table.caption, "examples", table.examples),
                 destination);
     }
 
