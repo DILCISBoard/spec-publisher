@@ -1,7 +1,9 @@
 package eu.dilcis.csip.structure;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Writer;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -9,29 +11,34 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.yaml.snakeyaml.Yaml;
 
+import eu.dilcis.csip.profile.Appendix;
+import eu.dilcis.csip.profile.ControlledVocabulary;
+import eu.dilcis.csip.profile.Example;
+import eu.dilcis.csip.profile.ExternalSchema;
 import eu.dilcis.csip.profile.MetsProfile;
 import eu.dilcis.csip.profile.Profiles;
 import eu.dilcis.csip.profile.Requirement.RequirementId;
 import eu.dilcis.csip.structure.SpecificationStructure.Part;
-import eu.dilcis.csip.structure.SpecificationStructure.Section;
 import eu.dilcis.csip.structure.SpecificationStructure.SourceType;
-import eu.dilcis.csip.structure.SpecificationStructure.Table;
 
 public final class StructFileParser {
     public static StructFileParser parserInstance(final Collection<MetsProfile> profiles) {
         return new StructFileParser(profiles);
     }
 
-    static Table tableFromMap(final Collection<MetsProfile> profiles, final Path root, final String name, final Map<String, Object> entryMap)
+    static Table tableFromMap(final Collection<MetsProfile> profiles, final Path root, final String name,
+            final Map<String, Object> entryMap)
             throws ParseException {
         try {
             final String heading = stringFromMap(name, "heading", entryMap);
@@ -40,7 +47,8 @@ public final class StructFileParser {
                 throw new ParseException("Target file is a directory: " + path + " for table: " + name);
             }
             final List<RequirementId> reqIds = getRequirementIds(profiles, name, entryMap);
-            return SpecificationStructure.tableFromValues(name, path, heading, reqIds);
+            final Set<Example> examples = Profiles.examplesFromRequirments(profiles, reqIds);
+            return SpecificationStructure.tableFromValues(name, path, heading, reqIds, examples);
         } catch (final ClassCastException e) {
             throw new ParseException("Invalid key value for table: " + name, e);
         } catch (final NoSuchElementException e) {
@@ -48,7 +56,8 @@ public final class StructFileParser {
         }
     }
 
-    private static List<RequirementId> getRequirementIds(final Collection<MetsProfile> profiles, final String name, final Map<String, Object> entryMap) throws ParseException {
+    private static List<RequirementId> getRequirementIds(final Collection<MetsProfile> profiles, final String name,
+            final Map<String, Object> entryMap) throws ParseException {
         @SuppressWarnings("unchecked")
         final List<String> reqIds = (List<String>) entryMap.get("requirements");
         if (reqIds != null && !reqIds.isEmpty()) {
@@ -56,9 +65,10 @@ public final class StructFileParser {
         }
         final String sectionName = stringFromMap(name, "section", entryMap);
         final eu.dilcis.csip.profile.Section section = eu.dilcis.csip.profile.Section.fromEleName(sectionName);
-        List<RequirementId> reqList = new ArrayList<>();
+        final List<RequirementId> reqList = new ArrayList<>();
         for (final MetsProfile profile : profiles) {
-            reqList.addAll(profile.getRequirementsBySection(section).stream().map(r -> r.id).collect(Collectors.toList()));
+            reqList.addAll(
+                    profile.getRequirementsBySection(section).stream().map(r -> r.id).collect(Collectors.toList()));
         }
         return reqList;
     }
@@ -131,7 +141,7 @@ public final class StructFileParser {
             throw new IllegalArgumentException("Parameter root is null, or is not an existing directory.");
         }
         this.root = root;
-        final Map<Part, List<SpecificationStructure.Section>> content = new EnumMap<>(Part.class);
+        final Map<Part, List<Section>> content = new EnumMap<>(Part.class);
         for (final Entry<String, List<Map<String, Object>>> entryMap : this.parseYamlStream(source).entrySet()) {
             final List<Section> sections = new ArrayList<>();
             for (final Map<String, Object> entry : entryMap.getValue()) {
@@ -172,7 +182,63 @@ public final class StructFileParser {
 
     private Section sectionFromMetsMapEntry(final String name, final SourceType type,
             final Map<String, Object> entryMap) throws ParseException {
+        final String source = stringFromMap(name, "source", entryMap);
+        final Path path = pathFromMap(this.root, name, entryMap);
+        Map<String, Object> context = new HashMap<>();
+        context.put("label", stringFromMap(name, "label", entryMap));
+        context.put("name", name);
+        try {
+            if ("Appendix".equals(source)) {
+                serialiseAppendices(path, context);
+            } else if ("external_schema".equals(source)) {
+                serialiseExternalSchema(path, context);
+            } else if ("vocabulary".equals(source)) {
+                serialiseVocabs(path, context);
+            } else if ("requirements".equals(source)) {
+                context.put("profiles", this.profiles.values());
+                Utilities.serialiseToTemplate("eu/dilcis/csip/out/appendix_requirements.mustache", context,
+                        new FileWriter(path.toFile()));
+            } else {
+                throw new ParseException("Invalid source value for entry: " + name);
+            }
+
+        } catch (IOException e) {
+            throw new ParseException(source + " serialisation failed for entry: " + name, e);
+        }
         return this.sectionFromMap(name, type, entryMap);
+    }
+
+    private void serialiseAppendices(final Path path, final Map<String, Object> context) throws IOException {
+        List<Appendix> appendices = new ArrayList<>();
+        for (MetsProfile profile : this.profiles.values()) {
+            appendices.addAll(profile.getAppendices());
+        }
+        context.put("appendices", appendices);
+        try (Writer writer = new FileWriter(path.toFile())) {
+            Utilities.serialiseToTemplate("eu/dilcis/csip/out/appendices.mustache", context, writer);
+        }
+    }
+
+    private void serialiseExternalSchema(final Path path, final Map<String, Object> context) throws IOException {
+        List<ExternalSchema> schema = new ArrayList<>();
+        for (MetsProfile profile : this.profiles.values()) {
+            schema.addAll(profile.getSchema());
+        }
+        context.put("schema", schema);
+        try (Writer writer = new FileWriter(path.toFile())) {
+            Utilities.serialiseToTemplate("eu/dilcis/csip/out/schema.mustache", context, writer);
+        }
+    }
+
+    private void serialiseVocabs(final Path path, final Map<String, Object> context) throws IOException {
+        List<ControlledVocabulary> vocabularies = new ArrayList<>();
+        for (MetsProfile profile : this.profiles.values()) {
+            vocabularies.addAll(profile.getVocabularies());
+        }
+        context.put("vocabularies", vocabularies);
+        try (Writer writer = new FileWriter(path.toFile())) {
+            Utilities.serialiseToTemplate("eu/dilcis/csip/out/vocabularies.mustache", context, writer);
+        }
     }
 
     private Map<String, List<Map<String, Object>>> parseYamlStream(final InputStream source) throws ParseException {
@@ -191,7 +257,7 @@ public final class StructFileParser {
         try {
             return this.fromYamlStream(Files.newInputStream(source), this.root);
         } catch (ParseException | IOException e) {
-            throw new ParseException("Exception caught when parsing source: " + root, e);
+            throw new ParseException("Exception caught when parsing source: " + source, e);
         }
     }
 }

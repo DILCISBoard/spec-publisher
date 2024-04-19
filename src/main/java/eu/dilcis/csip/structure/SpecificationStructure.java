@@ -12,97 +12,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
-
+import eu.dilcis.csip.profile.Example;
 import eu.dilcis.csip.profile.MetsProfile;
 import eu.dilcis.csip.profile.Requirement;
 import eu.dilcis.csip.profile.Requirement.RequirementId;
 
 public final class SpecificationStructure {
-    public static class Section {
-        public final String name;
-        public final Path source;
-        public final SourceType type;
-
-        private Section(final String name, final Path source, final SourceType type) {
-            super();
-            this.name = name;
-            this.source = source;
-            this.type = type;
-        }
-
-        @Override
-        public final int hashCode() {
-            return Objects.hash(name, source, type);
-        }
-
-        @Override
-        public final boolean equals(final Object obj) {
-            if (this == obj)
-                return true;
-            if (!(obj instanceof Section))
-                return false;
-            final Section other = (Section) obj;
-            return Objects.equals(name, other.name) && Objects.equals(source, other.source) && type == other.type;
-        }
-
-        @Override
-        public String toString() {
-            final StringBuilder builder = new StringBuilder();
-            builder.append("Section [");
-            if (name != null)
-                builder.append("name=").append(name).append(", ");
-            if (source != null)
-                builder.append("source=").append(source).append(", ");
-            if (type != null)
-                builder.append("type=").append(type);
-            builder.append("]");
-            return builder.toString();
-        }
-
-    }
-
-    static final class Table extends Section {
-        public final String caption;
-        public final List<RequirementId> requirements;
-
-        private Table(final String name, final Path source, final String caption,
-                final List<RequirementId> requirements) {
-            this(name, source, SourceType.HTML, caption, requirements);
-        }
-
-        private Table(final String name, final Path source, final SourceType type, final String caption,
-                final List<RequirementId> requirements) {
-            super(name, source, type);
-            this.caption = caption;
-            this.requirements = Collections.unmodifiableList(requirements);
-        }
-
-        @Override
-        public String toString() {
-            final StringBuilder builder = new StringBuilder();
-            builder.append("Table [");
-            if (name != null)
-                builder.append("name=").append(name).append(", ");
-            if (source != null)
-                builder.append("source=").append(source).append(", ");
-            if (type != null)
-                builder.append("type=").append(type).append(", ");
-            if (caption != null)
-                builder.append("caption=").append(caption).append(", ");
-            if (requirements != null)
-                builder.append("requirements=").append(requirements);
-            builder.append("]");
-            return builder.toString();
-        }
-    }
-
     enum SourceType {
-        MARKDOWN, HTML, LATEX, TABLE, METS;
+        MARKDOWN, TABLE, METS;
 
         static final SourceType fromString(final String type) throws ParseException {
             if (type != null) {
@@ -147,14 +67,6 @@ public final class SpecificationStructure {
         return table.source;
     }
 
-    static String htmlTable(final Table table, final Collection<MetsProfile> profiles) throws IOException {
-        return tableStringFromTemplate(table, profiles, "eu/dilcis/csip/out/table.mustache");
-    }
-
-    static String markdownTable(final Table table, final Collection<MetsProfile> profiles) throws IOException {
-        return tableStringFromTemplate(table, profiles, "eu/dilcis/csip/out/table_markdown.mustache");
-    }
-
     static final void serialiseTable(final Table table, final Collection<MetsProfile> profiles, final String template,
             final Writer destination) throws IOException {
         final List<Requirement> requirements = profiles.stream().flatMap(p -> p.getRequirements().stream())
@@ -162,15 +74,13 @@ public final class SpecificationStructure {
         if (requirements.size() != table.requirements.size()) {
             throw new NoSuchElementException("Not all requirements found in profiles." + requirements);
         }
-        final MustacheFactory mf = new DefaultMustacheFactory();
-        final Mustache m = mf.compile(template);
-        final Map<String, Object> context = Map.of("requirements", requirements, "caption", table.caption);
-        m.execute(destination, context).flush();
+        Utilities.serialiseToTemplate(template, Map.of("requirements", requirements, "caption", table.caption),
+                destination);
     }
 
     static final Table tableFromValues(final String name, final Path source, final String caption,
-            final List<RequirementId> requirements) {
-        return new Table(name, source, caption, requirements);
+            final List<RequirementId> requirements, final Set<Example> examples) {
+        return new Table(name, source, caption, requirements, examples);
     }
 
     static final Section sectionFromValues(final String name, final Path source) {
@@ -185,7 +95,7 @@ public final class SpecificationStructure {
         return new SpecificationStructure(content);
     }
 
-    private static String tableStringFromTemplate(final Table table, final Collection<MetsProfile> profiles,
+    static String tableStringFromTemplate(final Table table, final Collection<MetsProfile> profiles,
             final String template) throws IOException {
         try (final StringWriter writer = new StringWriter()) {
             serialiseTable(table, profiles, template, writer);

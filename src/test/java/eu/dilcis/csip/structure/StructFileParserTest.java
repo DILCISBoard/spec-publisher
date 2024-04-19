@@ -22,8 +22,6 @@ import eu.dilcis.csip.profile.MetsProfile;
 import eu.dilcis.csip.profile.MetsProfileParser;
 import eu.dilcis.csip.profile.Profiles;
 import eu.dilcis.csip.structure.SpecificationStructure.Part;
-import eu.dilcis.csip.structure.SpecificationStructure.Section;
-import eu.dilcis.csip.structure.SpecificationStructure.Table;
 
 public class StructFileParserTest {
     private static MetsProfileParser profileParser = MetsProfileParser.newInstance();
@@ -175,7 +173,8 @@ public class StructFileParserTest {
         InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/table.yaml");
         final List<Map<String, Object>> mapList = new Yaml().load(is);
 
-        Table table = StructFileParser.tableFromMap(Arrays.asList(new MetsProfile[] { csipProfile }), Path.of("."), (String) mapList.get(0).get("name"), mapList.get(0));
+        Table table = StructFileParser.tableFromMap(Arrays.asList(new MetsProfile[] { csipProfile }), Path.of("."),
+                (String) mapList.get(0).get("name"), mapList.get(0));
         assertNotNull(table);
         assertEquals("requirements.METS.package", table.name);
         assertEquals("Table should have 6 requirments.", 6, table.requirements.size());
@@ -189,7 +188,8 @@ public class StructFileParserTest {
         InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/table_mets_section.yaml");
         final List<Map<String, Object>> mapList = new Yaml().load(is);
 
-        Table table = StructFileParser.tableFromMap(Arrays.asList(new MetsProfile[] { csipProfile }), Path.of("."), (String) mapList.get(0).get("name"), mapList.get(0));
+        Table table = StructFileParser.tableFromMap(Arrays.asList(new MetsProfile[] { csipProfile }), Path.of("."),
+                (String) mapList.get(0).get("name"), mapList.get(0));
         assertNotNull(table);
         assertEquals("requirements.METS.package", table.name);
         assertEquals("Table should have 6 requirments.", 6, table.requirements.size());
@@ -204,7 +204,7 @@ public class StructFileParserTest {
         SpecificationStructure structure = parser.fromYamlStream(is, STRUCT_ROOT);
         assertNotNull(structure);
         assertEquals("Parsed Structure should have 6 sections", 6, structure.content.get(Part.BODY).size());
-        for (SpecificationStructure.Section section : structure.content.get(Part.BODY)) {
+        for (Section section : structure.content.get(Part.BODY)) {
             assertNotNull(section);
             assertNotNull(section.name);
             assertNotNull(section.source);
@@ -216,10 +216,11 @@ public class StructFileParserTest {
     public void testTableGenerator() throws ParseException, IOException {
         InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/struct_test.yaml");
         SpecificationStructure structure = parser.fromYamlStream(is, STRUCT_ROOT);
-        for (SpecificationStructure.Section section : structure.content.get(Part.BODY)) {
+        for (Section section : structure.content.get(Part.BODY)) {
             if (section instanceof Table) {
                 Table table = (Table) section;
-                String html = SpecificationStructure.htmlTable(table, Arrays.asList(new MetsProfile[] { geoProfile }));
+                String html = SpecificationStructure.tableStringFromTemplate(table,
+                        Arrays.asList(new MetsProfile[] { geoProfile }), "eu/dilcis/csip/out/table.mustache");
                 assertNotNull(html);
                 assertTrue(html.contains("<table>"));
                 assertTrue(html.contains("</table>"));
