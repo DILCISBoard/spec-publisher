@@ -297,6 +297,12 @@ public final class MetsProfileParser extends DefaultHandler {
                 this.vocabBuilder.name(this.charBuff.getBufferValue());
                 break;
             case XmlConstants.MAINT_ELE:
+                this.vocabBuilder.maintenanceAgency(this.charBuff.getBufferValue());
+                break;
+            case XmlConstants.URI_ELE:
+                this.vocabBuilder.uri(this.charBuff.getBufferValue());
+                break;
+            case XmlConstants.CONTEXT_ELE:
                 this.vocabBuilder.context(this.charBuff.getBufferValue());
                 break;
             case XmlConstants.PARA_ELE:
