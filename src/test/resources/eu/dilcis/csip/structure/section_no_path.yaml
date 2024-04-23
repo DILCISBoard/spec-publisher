@@ -1,4 +1,4 @@
 ---
 - name: context
-  type: markdown
+  type: file
 

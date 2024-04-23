@@ -1,4 +1,4 @@
 ---
 - name: context
-  type: markdown
-  path: context
+  type: file
+  source: context

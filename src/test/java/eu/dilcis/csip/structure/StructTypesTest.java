@@ -7,12 +7,13 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 public class StructTypesTest {
     @Test
     public void testEqualsHashSection() {
-        EqualsVerifier.forClass(Section.class).verify();
+        EqualsVerifier.forClass(Source.class).verify();
     }
 
     @Test
     public void testEqualsHashTable() {
-        EqualsVerifier.forClass(Table.class).withIgnoredFields("caption", "requirements", "examples").verify();
+        EqualsVerifier.forClass(RequirementsSource.class).withIgnoredFields("requirements", "examples")
+                .verify();
     }
 
     @Test

@@ -1,7 +1,6 @@
 
 - name: requirements.METS.package
   heading: "Table 3: Requirements for the information package"
-  path: "requirements/METS/package/requirements.md"
   requirements:
     - GEO_2
     - GEO_3

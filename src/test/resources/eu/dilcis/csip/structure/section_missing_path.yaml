@@ -1,4 +1,4 @@
 ---
 - name: context
-  type: markdown
-  path: context/missing.md
+  type: file
+  source: context/missing.md
