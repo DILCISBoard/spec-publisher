@@ -136,6 +136,7 @@ public final class MetsProfileParser extends DefaultHandler {
         } else if (XmlConstants.VOCAB_ELE.equals(this.currentElementName)) {
             this.inVocab = true;
             this.vocabBuilder = new ControlledVocabulary.Builder();
+            this.vocabBuilder.id(Utilities.getId(attrs));
         } else if (XmlConstants.APPENDIX_ELE.equals(this.currentElementName)) {
             this.startAppendix(attrs);
         } else if (this.inAppendix) {
@@ -234,19 +235,8 @@ public final class MetsProfileParser extends DefaultHandler {
     private void processRequirementChildStart(final Attributes eleAtts) {
         if (XmlConstants.ANCHOR_ELE.equals(this.currentElementName)) {
             this.reqBuilder.descPart(this.charBuff.getBufferValue());
-            this.currentHref = this.getHref(eleAtts);
+            this.currentHref = Utilities.getHref(eleAtts);
         }
-    }
-
-    private String getHref(final Attributes attrs) {
-        if (attrs == null)
-            return null;
-        for (int i = 0; i < attrs.getLength(); i++) {
-            final String aName = attrs.getLocalName(i); // Attr name
-            if ("href".equals(aName))
-                return attrs.getValue(i);
-        }
-        return null;
     }
 
     private void processRequirementChild() {
@@ -291,6 +281,7 @@ public final class MetsProfileParser extends DefaultHandler {
                 break;
         }
     }
+
     private void processVocabEle() {
         switch (this.currentElementName) {
             case XmlConstants.NAME_ELE:

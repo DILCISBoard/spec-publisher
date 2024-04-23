@@ -19,6 +19,10 @@ public final class Utilities {
         return getAttValue(attrs, XmlConstants.LABEL_ATT);
     }
 
+    static String getHref(final Attributes attrs) {
+        return getAttValue(attrs, "href");
+    }
+
     static String getAttValue(final Attributes attrs,
             final String attName) {
         if (attrs != null) {

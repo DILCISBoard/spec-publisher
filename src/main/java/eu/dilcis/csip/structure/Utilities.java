@@ -8,12 +8,12 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 
-class Utilities {
+public class Utilities {
     private Utilities() {
         throw new UnsupportedOperationException("Utility class");
     }
 
-    static void serialiseToTemplate(final String template, final Map<String, Object> context,
+    public static void serialiseToTemplate(final String template, final Map<String, Object> context,
             final Writer destination) throws IOException {
         final MustacheFactory mf = new DefaultMustacheFactory();
         final Mustache m = mf.compile(template);

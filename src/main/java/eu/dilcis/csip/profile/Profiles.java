@@ -17,16 +17,12 @@ public class Profiles {
     }
 
     public static final Set<Example> examplesFromRequirments(final Collection<MetsProfile> profiles,
-            final List<RequirementId> requirements) {
+            final List<Requirement> requirements) {
         final Set<Example> examples = new HashSet<>();
-        for (final RequirementId requirementId : requirements) {
+        for (final Requirement requirement : requirements) {
             for (final MetsProfile profile : profiles) {
-                if (profile.getRequirementById(requirementId) != null) {
-                    Requirement requirement = profile.getRequirementById(requirementId);
-                    for (final String exampleId : requirement.examples) {
-                        examples.add(profile.getExampleById(exampleId));
-                    }
-                    break;
+                for (final String exampleId : requirement.examples) {
+                    examples.add(profile.getExampleById(exampleId));
                 }
             }
         }
