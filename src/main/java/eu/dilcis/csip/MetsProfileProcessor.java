@@ -104,6 +104,15 @@ public final class MetsProfileProcessor implements Callable<Integer> {
                 try (Writer writer = new FileWriter(
                         this.destination.resolve("../pdf").resolve(entry.getKey().getFileName()).toFile())) {
                     for (Source section : entry.getValue()) {
+                        if (Part.APPENDICES.equals(entry.getKey())) {
+                            Map<String, Object> context = new java.util.HashMap<>();
+                            context.put("heading", section.heading);
+                            context.put("label", section.label);
+                            context.put("isFirst", isFirst);
+                            context.put("pdf", true);
+                            isFirst = false;
+                            Utilities.serialiseToTemplate("eu/dilcis/csip/out/appendix_heading.mustache", context, writer);
+                        }
                         section.serialise(writer, true);
                         writer.write("\n");
                     }
