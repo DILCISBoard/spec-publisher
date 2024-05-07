@@ -1,7 +1,6 @@
 package eu.dilcis.csip;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -89,7 +88,8 @@ public final class MetsProfileProcessor implements Callable<Integer> {
                             context.put("label", section.label);
                             context.put("isFirst", isFirst);
                             isFirst = false;
-                            Utilities.serialiseToTemplate("eu/dilcis/csip/out/appendix_heading.mustache", context, writer);
+                            Utilities.serialiseToTemplate("eu/dilcis/csip/out/appendix_heading.mustache", context,
+                                    writer);
                         }
                         section.serialise(writer, false);
                         writer.write("\n");
@@ -109,9 +109,9 @@ public final class MetsProfileProcessor implements Callable<Integer> {
                             context.put("heading", section.heading);
                             context.put("label", section.label);
                             context.put("isFirst", isFirst);
-                            context.put("pdf", true);
                             isFirst = false;
-                            Utilities.serialiseToTemplate("eu/dilcis/csip/out/appendix_heading.mustache", context, writer);
+                            Utilities.serialiseToTemplate("eu/dilcis/csip/out/appendix_heading.mustache", context,
+                                    writer);
                         }
                         section.serialise(writer, true);
                         writer.write("\n");
