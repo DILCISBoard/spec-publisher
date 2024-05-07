@@ -101,6 +101,7 @@ public final class MetsProfileProcessor implements Callable<Integer> {
                 }
             }
             for (Entry<Part, List<Source>> entry : specStructure.content.entrySet()) {
+                isFirst = true;
                 try (Writer writer = new FileWriter(
                         this.destination.resolve("../pdf").resolve(entry.getKey().getFileName()).toFile())) {
                     for (Source section : entry.getValue()) {
