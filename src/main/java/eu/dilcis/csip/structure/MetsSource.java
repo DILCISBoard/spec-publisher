@@ -8,13 +8,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import eu.dilcis.csip.profile.Appendix;
 import eu.dilcis.csip.profile.ControlledVocabulary;
 import eu.dilcis.csip.profile.ExternalSchema;
 import eu.dilcis.csip.profile.MetsProfile;
-import eu.dilcis.csip.structure.Source.SourceType;
 
 final class MetsSource extends Source {
     static final MetsSource fromValues(final String name, final String heading, final String label,
@@ -39,6 +37,8 @@ final class MetsSource extends Source {
         final Map<String, Object> context = new HashMap<>();
         context.put("label", label);
         context.put("name", name);
+        context.put("pdf", isPdf);
+
         if ("Appendix".equals(section)) {
             serialiseAppendices(destination, context);
         } else if ("external_schema".equals(section)) {
