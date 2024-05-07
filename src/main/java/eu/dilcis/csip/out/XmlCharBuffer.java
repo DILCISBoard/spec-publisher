@@ -8,7 +8,7 @@ package eu.dilcis.csip.out;
  *
  */
 public final class XmlCharBuffer {
-	private StringBuffer textBuffer = null;
+	private StringBuilder textBuffer = null;
 	/**
 	 * Get the value of the text buffer
 	 */
@@ -20,7 +20,7 @@ public final class XmlCharBuffer {
 	 * Get the value of the text buffer and erase the buffer contents
 	 */
 	public String voidBuffer() {
-		String retVal = this.getBufferValue();
+		final String retVal = this.getBufferValue();
 		this.textBuffer = null;
 		return retVal;
 	}
@@ -30,7 +30,7 @@ public final class XmlCharBuffer {
 	 */
 	public void addToBuffer(final String toAdd) {
 		if (this.textBuffer == null) {
-			this.textBuffer = new StringBuffer(toAdd);
+			this.textBuffer = new StringBuilder(toAdd);
 		} else {
 			this.textBuffer.append(toAdd);
 		}

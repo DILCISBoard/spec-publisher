@@ -15,26 +15,10 @@ import java.util.List;
  */
 
 public final class ExternalSchema {
-	final static String empty = ""; //$NON-NLS-1$
-	final static String defaultUrlVal = "http://example.com"; //$NON-NLS-1$
-	public final String name;
-	public final URI url;
-	public final String context;
-	public final List<String> note;
-
-	ExternalSchema(final String name, final URI url, final String context,
-			final List<String> note) {
-		super();
-		this.name = name;
-		this.url = url;
-		this.context = context;
-		this.note = Collections.unmodifiableList(note);
-	}
-
 	public static class Builder {
-		private String nm = empty;
-		private URI rl = URI.create(defaultUrlVal);
-		private String cntxt = empty;
+		private String nm = Constants.EMPTY;
+		private URI rl = URI.create(Constants.DEFAULT_URI);
+		private String cntxt = Constants.EMPTY;
 		private List<String> nt = new ArrayList<>();
 
 		public Builder() {
@@ -74,5 +58,19 @@ public final class ExternalSchema {
 		public ExternalSchema build( ) {
 			return new ExternalSchema(this.nm, this.rl, this.cntxt, this.nt);
 		}
+	}
+	public final String name;
+	public final URI url;
+	public final String context;
+
+	public final List<String> note;
+
+	ExternalSchema(final String name, final URI url, final String context,
+			final List<String> note) {
+		super();
+		this.name = name;
+		this.url = url;
+		this.context = context;
+		this.note = Collections.unmodifiableList(note);
 	}
 }

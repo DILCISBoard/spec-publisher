@@ -1,0 +1,36 @@
+---
+body:
+  - name: context
+    type: markdown
+    path: context/index.md
+
+  - name: requirements.structure
+    type: markdown
+    path: requirements/structure/index.md
+
+  - name: requirements.METS.package_reps
+    type: markdown
+    path: requirements/METS/package_reps/index.md
+
+  - name: requirements.METS.package_reps
+    type: table
+    heading: "Table 2: Geospatial information package requirement"
+    path: "requirements/METS/package_reps/requirements.md"
+    requirements:
+      - GEO_1
+
+  - name: requirements.METS.package
+    type: markdown
+    path: requirements/METS/package/index.md
+
+  - name: requirements.METS.package
+    type: table
+    path: "requirements/METS/package/requirements.md"
+    heading: "Table 3: Requirements for the information package"
+    requirements:
+      - GEO_2
+      - GEO_3
+      - GEO_4
+      - GEO_5
+      - GEO_6
+      - GEO_7

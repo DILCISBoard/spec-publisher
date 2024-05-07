@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -21,20 +21,52 @@ import eu.dilcis.csip.profile.Section;
  */
 
 public final class OutputHandler {
-	private static final String lineSepPropName = "line.separator"; //$NON-NLS-1$
-	private static final String lineEnd = System.getProperty(lineSepPropName);
-	private static final String utf8 = "UTF8"; //$NON-NLS-1$
-	private static final String mdExt = ".md"; //$NON-NLS-1$
-	private static final String reqsMd = "requirements" + mdExt; //$NON-NLS-1$
-	private static final String examplesMd = "examples" + mdExt; //$NON-NLS-1$
+	private static final String LINE_SEP_PROP = "line.separator"; //$NON-NLS-1$
+	private static final String LINE_END = System.getProperty(LINE_SEP_PROP);
+	private static final String MD_EXT = ".md"; //$NON-NLS-1$
+	private static final String REQUIREMENTS_MD = "requirements" + MD_EXT; //$NON-NLS-1$
+	private static final String EXAMPLES_MD = "examples" + MD_EXT; //$NON-NLS-1$
+	public static OutputHandler toStdOut() {
+		return new OutputHandler();
+	}
+
+	public static OutputHandler toSectionRequirements(final Path projRoot,
+			final Section sect) throws IOException {
+		return new OutputHandler(getSectionPath(projRoot, sect.sectName)
+				.resolve(Paths.get(REQUIREMENTS_MD)).toFile());
+	}
+
+	public static OutputHandler toSectionExamples(final Path projRoot, final Section sect)
+			throws IOException {
+		return new OutputHandler(getSectionPath(projRoot, sect.sectName)
+				.resolve(Paths.get(EXAMPLES_MD)).toFile());
+	}
+
+	// ===========================================================
+	// Utility Methods ...
+	// ===========================================================
+
+	public static OutputHandler toAppendix(final Path metsReqRoot,
+			final String appndxName) throws IOException {
+		return new OutputHandler(metsReqRoot.resolve(Paths.get("specification",
+				"appendices", appndxName, appndxName + MD_EXT)).toFile());
+	}
+
+	private static Path getSectionPath(final Path projRoot,
+			final String sectName) {
+		final Path toReqRoot = Paths.get("specification", "implementation", //$NON-NLS-1$ //$NON-NLS-2$
+				"metadata", "mets", sectName); //$NON-NLS-1$ //$NON-NLS-2$
+		return projRoot.resolve(toReqRoot);
+	}
+
 	private final Writer out;
 
 	/**
 	 * Default constructor, output to STDOUT
 	 */
-	private OutputHandler() throws UnsupportedEncodingException {
+	private OutputHandler() {
 		super();
-		this.out = new OutputStreamWriter(System.out, utf8);
+		this.out = new OutputStreamWriter(System.out, StandardCharsets.UTF_8);
 	}
 
 	/**
@@ -45,17 +77,13 @@ public final class OutputHandler {
 		if (!outFile.getParentFile().exists()) {
 			outFile.getParentFile().mkdirs();
 		}
-		File output = new File(outFile.getParentFile(), outFile.getName());
+		final File output = new File(outFile.getParentFile(), outFile.getName());
 		this.out = new FileWriter(output);
 	}
 
-	// ===========================================================
-	// Utility Methods ...
-	// ===========================================================
-
 	// Wrap I/O exceptions in SAX exceptions, to
 	// suit handler signature requirements
-	public void emit(String s) throws IOException {
+	public void emit(final String s) throws IOException {
 		if (s == null)
 			return;
 		this.out.write(s);
@@ -64,37 +92,8 @@ public final class OutputHandler {
 
 	// Start a new line
 	public void nl() throws IOException {
-		this.out.write(lineEnd);
+		this.out.write(LINE_END);
 		this.out.flush();
-	}
-
-	public static OutputHandler toStdOut() throws UnsupportedEncodingException {
-		return new OutputHandler();
-	}
-
-	public static OutputHandler toSectionRequirements(Path projRoot,
-			Section sect) throws IOException {
-		return new OutputHandler(getSectionPath(projRoot, sect.sectName)
-				.resolve(Paths.get(reqsMd)).toFile());
-	}
-
-	public static OutputHandler toSectionExamples(Path projRoot, Section sect)
-			throws IOException {
-		return new OutputHandler(getSectionPath(projRoot, sect.sectName)
-				.resolve(Paths.get(examplesMd)).toFile());
-	}
-
-	public static OutputHandler toAppendix(Path metsReqRoot,
-			final String appndxName) throws IOException {
-		return new OutputHandler(metsReqRoot.resolve(Paths.get("specification",
-				"appendices", appndxName, appndxName + mdExt)).toFile());
-	}
-
-	private static Path getSectionPath(final Path projRoot,
-			final String sectName) {
-		Path toReqRoot = Paths.get("specification", "implementation", //$NON-NLS-1$ //$NON-NLS-2$
-				"metadata", "mets", sectName); //$NON-NLS-1$ //$NON-NLS-2$
-		return projRoot.resolve(toReqRoot);
 	}
 
 }

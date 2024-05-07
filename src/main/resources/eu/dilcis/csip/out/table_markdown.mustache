@@ -1,0 +1,5 @@
+|  ID     | Name, Location & Description | Card & Level |
+| ------- | ---------------------------- | ------------ |
+{{#requirements}}
+| <a name="{{ id }}"/>**{{ id }}** | **{{ details.name }}**<br/>{{#xPath}}`{{ xPath }}`{{/xPath}}{{^xPath}}`N/A`{{/xPath}}{{#description}}<br/>{{.}}{{/description}} | **{{ cardinality }}**<br/>{{ details.level }} |
+{{/requirements}}

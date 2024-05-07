@@ -15,33 +15,12 @@ import java.util.List;
  */
 
 public final class ControlledVocabulary {
-	static final String EMPTY = ""; //$NON-NLS-1$
-	static final String DEFAULT_URI = "http://example.com"; //$NON-NLS-1$
-
-	public final String id;
-	public final String name;
-	public final String maintenanceAgency;
-	public final URI uri;
-	public final String context;
-	public final List<String> description;
-
-	ControlledVocabulary(final String id, final String name, final String maintenanceAgency, final URI uri,
-			final String context, final List<String> description) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.maintenanceAgency = maintenanceAgency;
-		this.uri = uri;
-		this.context = context;
-		this.description = Collections.unmodifiableList(description);
-	}
-
 	public static class Builder {
-		private String ident = EMPTY;
-		private String nm = EMPTY;
-		private String mntnceAgncy = EMPTY;
-		private URI ri = URI.create(DEFAULT_URI);
-		private String cntxt = EMPTY;
+		private String ident = Constants.EMPTY;
+		private String nm = Constants.EMPTY;
+		private String mntnceAgncy = Constants.EMPTY;
+		private URI ri = URI.create(Constants.DEFAULT_URI);
+		private String cntxt = Constants.EMPTY;
 		private List<String> desc = new ArrayList<>();
 
 		public Builder() {
@@ -91,5 +70,23 @@ public final class ControlledVocabulary {
 		public ControlledVocabulary build( ) {
 			return new ControlledVocabulary(this.ident, this.nm, this.mntnceAgncy, this.ri, this.cntxt, this.desc);
 		}
+	}
+	public final String id;
+	public final String name;
+	public final String maintenanceAgency;
+	public final URI uri;
+	public final String context;
+
+	public final List<String> description;
+
+	ControlledVocabulary(final String id, final String name, final String maintenanceAgency, final URI uri,
+			final String context, final List<String> description) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.maintenanceAgency = maintenanceAgency;
+		this.uri = uri;
+		this.context = context;
+		this.description = Collections.unmodifiableList(description);
 	}
 }

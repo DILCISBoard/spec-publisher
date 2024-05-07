@@ -31,31 +31,21 @@ enum GitHubMarkdownFormatter {
     // HTML Tags
     private static final String anchorOpen = "<a name=\""; //$NON-NLS-1$
     private static final String anchorClose = "\"></a>"; //$NON-NLS-1$
-    private static final String hrefEleStart = " <a href=\""; //$NON-NLS-1$
     static final String htmlBr = " <br/> "; //$NON-NLS-1$
 
     static String makeBold(final String toBold) {
         if (toBold == null || toBold.isEmpty())
             return EMPTY;
-        StringBuilder buff = new StringBuilder(mdBoldMarker);
+        final StringBuilder buff = new StringBuilder(mdBoldMarker);
         buff.append(toBold);
         buff.append(mdBoldMarker);
-        return buff.toString();
-    }
-
-    private static String makePandocBold(final String toBold) {
-        if (toBold == null || toBold.isEmpty())
-            return EMPTY;
-        StringBuilder buff = new StringBuilder("\\\\textbf{");
-        buff.append(toBold);
-        buff.append("}");
         return buff.toString();
     }
 
     static String makeConsole(final String toConsole) {
         if (toConsole == null || toConsole.isEmpty())
             return EMPTY;
-        StringBuilder buff = new StringBuilder(mdConsoleMarker);
+        final StringBuilder buff = new StringBuilder(mdConsoleMarker);
         buff.append(toConsole);
         buff.append(mdConsoleMarker);
         return buff.toString();
@@ -66,38 +56,38 @@ enum GitHubMarkdownFormatter {
     }
 
     static String anchorCell(final String cellVal, final boolean isFirst) {
-        StringBuilder buff = new StringBuilder(anchor(cellVal));
+        final StringBuilder buff = new StringBuilder(anchor(cellVal));
         buff.append(makeBold(cellVal));
         return cell(buff.toString(), isFirst);
     }
 
     static String anchor(final String val) {
-        StringBuilder buff = new StringBuilder(anchorOpen);
+        final StringBuilder buff = new StringBuilder(anchorOpen);
         buff.append(val);
         buff.append(anchorClose);
         return buff.toString();
     }
 
     static String h1(final String heading) {
-        StringBuilder buff = new StringBuilder("# ");
+        final StringBuilder buff = new StringBuilder("# ");
         buff.append(heading);
         return buff.toString();
     }
 
     static String h2(final String heading) {
-        StringBuilder buff = new StringBuilder("## ");
+        final StringBuilder buff = new StringBuilder("## ");
         buff.append(heading);
         return buff.toString();
     }
 
     static String h3(final String heading) {
-        StringBuilder buff = new StringBuilder("### ");
+        final StringBuilder buff = new StringBuilder("### ");
         buff.append(heading);
         return buff.toString();
     }
 
     static String h4(final String heading) {
-        StringBuilder buff = new StringBuilder("#### ");
+        final StringBuilder buff = new StringBuilder("#### ");
         buff.append(heading);
         return buff.toString();
     }
@@ -106,24 +96,24 @@ enum GitHubMarkdownFormatter {
         return cell(cellVal, false);
     }
 
-    static String cell(final String cellVal, boolean isFirst) {
-        StringBuilder buff = (isFirst) ? new StringBuilder(cellDivOpen) : new StringBuilder(SPACE);
+    static String cell(final String cellVal, final boolean isFirst) {
+        final StringBuilder buff = (isFirst) ? new StringBuilder(cellDivOpen) : new StringBuilder(SPACE);
         buff.append(cellVal);
         buff.append(cellDivCls);
         return buff.toString();
     }
 
     static String makeHeadingLines(final String heading) {
-        int len = (heading == null || heading.isEmpty()) ? 1 : heading.length();
-        char[] chars = new char[len];
+        final int len = (heading == null || heading.isEmpty()) ? 1 : heading.length();
+        final char[] chars = new char[len];
         Arrays.fill(chars, hyphen);
         return new String(chars);
     }
 
-    static String concatDescription(List<String> description) {
+    static String concatDescription(final List<String> description) {
         if (description.isEmpty())
             return SPACE;
-        StringBuilder buff = new StringBuilder(description.get(0));
+        final StringBuilder buff = new StringBuilder(description.get(0));
         for (int i = 1; i < description.size(); i++) {
             buff.append(htmlBr);
             buff.append(description.get(i));
@@ -132,7 +122,7 @@ enum GitHubMarkdownFormatter {
     }
 
     static String href(final String href, final String textVal) {
-        StringBuilder buff = new StringBuilder("["); //$NON-NLS-1$
+        final StringBuilder buff = new StringBuilder("["); //$NON-NLS-1$
         buff.append(textVal + "](");
         buff.append(href + ")");
         return buff.toString();

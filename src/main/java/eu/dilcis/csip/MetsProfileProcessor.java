@@ -1,12 +1,29 @@
 package eu.dilcis.csip;
 
-import java.io.FileNotFoundException;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.Writer;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.Callable;
 
 import org.xml.sax.SAXException;
 
-import eu.dilcis.csip.profile.MetsProfileXmlHandler;
+import eu.dilcis.csip.profile.MetsProfile;
+import eu.dilcis.csip.profile.MetsProfileParser;
+import eu.dilcis.csip.structure.ParseException;
+import eu.dilcis.csip.structure.SpecificationStructure;
+import eu.dilcis.csip.structure.SpecificationStructure.Part;
+import eu.dilcis.csip.structure.SpecificationStructure.Section;
+import eu.dilcis.csip.structure.StructFileParser;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 
 /**
  * Main class and start of CLI programming. Passes args to ProcessorOptions for
@@ -20,61 +37,101 @@ import eu.dilcis.csip.profile.MetsProfileXmlHandler;
  *          Created 24 Oct 2018:06:37:19
  */
 
-public final class MetsProfileProcessor {
+@Command(name = "eark-profile-publisher", mixinStandardHelpOptions = true, version = "0.1.0", description = "Produces document collatoral from METS profile XML documents.")
+public final class MetsProfileProcessor implements Callable<Integer> {
+    /**
+     * Main method, controls top level flow from command line.
+     *
+     * @param args command line arg array
+     */
+    public static void main(final String[] args) {
+        final int exitCode = new CommandLine(new MetsProfileProcessor()).execute(args);
+        System.exit(exitCode);
+    }
 
-	private MetsProfileProcessor() {
-		throw new IllegalStateException();
-	}
+    @Parameters(paramLabel = "FILE", arity = "1..*", description = "A list of METS Profile documents to be processed.")
+    private File[] metsProfiles;
 
-	/**
-	 * Main method, controls top level flow from command line.
-	 * @param args command line arg array
-	 */
-	public static void main(String[] args) throws SAXException, IOException {
-		// Parse the command line options
-		ProcessorOptions opts = parseOpts(args);
-		if (opts.isUsage) {
-			// If help flag print usage message and quit
-			usage(System.out);
-			System.exit(0);
-		}
-		try {
-			// Create new SAX Parser handler initialised with opts and process
-			MetsProfileXmlHandler handler = new MetsProfileXmlHandler(opts);
-			handler.processProfile();
-		} catch (SAXException | IOException excep) {
-			// Basic for now, print the stack trace and trhow it
-			excep.printStackTrace();
-			throw excep;
-		}
-	}
+    @Option(names = { "-f",
+            "--file" }, required = true, paramLabel = "SPECIFICATION", description = "A YAML file that describes the specification structure.")
+    private File structureFile;
 
-	private static ProcessorOptions parseOpts(final String[] args) {
-		ProcessorOptions opts = null;
-		try {
-			// Create new opts object from args
-			opts = ProcessorOptions.fromArgs(args);
-		} catch (IllegalArgumentException | FileNotFoundException excep) {
-			// Something rotten in Denmark with passed parameters
-			System.err.println(excep.getMessage());
-			System.err.println();
-			usage(System.err);
-			System.exit(1);
-		}
-		return opts;
-	}
+    @Option(names = { "-o",
+            "--output" }, defaultValue = "./site", paramLabel = "OUTPUT", description = "A directory to hold the collatoral produced.")
+    private Path destination;
 
-	private static void usage(final PrintStream out) {
-		out.println("usage: mets-profile-proc [options] FILE"); //$NON-NLS-1$
-		out.println(""); //$NON-NLS-1$
-		out.println("Checks E-ARK CSIP METS Profile."); //$NON-NLS-1$
-		out.println("  -h prints this message."); //$NON-NLS-1$
-		out.println(
-				"  -o output requirements Markdown as files to current directory, default to STDOUT."); //$NON-NLS-1$
-		// out.println(" -d [DIRECTORY] output requirements Markdown as files in
-		// [DIRECTORY], default to STDOUT.");
-		// out.println(" -f [FILE] output requirements Markdown to single
-		// [FILE], default to STDOUT.");
-		out.println("  [FILE] is the METS Profile XML path."); //$NON-NLS-1$
-	}
+    @Override
+    public Integer call() {
+        int result = 0;
+        if (this.destination.toFile().exists() && !this.destination.toFile().isDirectory()) {
+            System.err.println("Destination must be a directory.");
+            return 1;
+        } else if (!this.destination.toFile().exists() && !this.destination.toFile().mkdirs()) {
+            System.err.println("Failed to create destination directory.");
+            return 1;
+        }
+
+        try {
+            final StructFileParser structParser = StructFileParser.parserInstance(this.processProfiles());
+            final SpecificationStructure specStructure = structParser.parseStructureFile(this.structureFile.toPath());
+            specStructure.serialiseSiteStructure(structParser.getProfiles());
+            for (Entry<Part, List<Section>> entry : specStructure.content.entrySet()) {
+                try (Writer writer = new FileWriter(this.destination.resolve(entry.getKey().getFileName()).toFile())) {
+                    if (Part.BODY.equals(entry.getKey())) {
+                        writer.write("!TOC\n\n");
+                    }
+                    for (Section section : entry.getValue()) {
+                        try (FileReader reader = new FileReader(section.source.toFile())) {
+                            reader.transferTo(writer);
+                        }
+                        writer.write("\n");
+                    }
+                    if (Part.BODY.equals(entry.getKey())) {
+                        writer.write("!INCLUDE \"appendices.md\"\n");
+                    }
+                    writer.flush();
+                }
+            }
+            specStructure.serialisePdfStructure(structParser.getProfiles());
+            for (Entry<Part, List<Section>> entry : specStructure.content.entrySet()) {
+                try (Writer writer = new FileWriter(
+                        this.destination.resolve("../pdf").resolve(entry.getKey().getFileName()).toFile())) {
+                    for (Section section : entry.getValue()) {
+                        try (FileReader reader = new FileReader(section.source.toFile())) {
+                            reader.transferTo(writer);
+                        }
+                        writer.write("\n");
+                    }
+                    if (Part.BODY.equals(entry.getKey())) {
+                        writer.write("!INCLUDE \"appendices.md\"\n");
+                    }
+                    writer.flush();
+                }
+            }
+        } catch (SAXException | IOException excep) {
+            // Basic for now, print the stack trace and trhow it
+            excep.printStackTrace();
+            result = 1;
+        } catch (final ParseException excep) {
+            excep.printStackTrace();
+            result = 2;
+        }
+        return result;
+    }
+
+    private List<MetsProfile> processProfiles() throws SAXException, IOException {
+        final List<MetsProfile> profiles = new ArrayList<>();
+        final MetsProfileParser parser = MetsProfileParser.newInstance();
+        for (final File profileXmlFile : this.metsProfiles) {
+            try {
+                final MetsProfile profile = parser.processXmlProfile(profileXmlFile.toPath());
+                profiles.add(profile);
+            } catch (SAXException | IOException excep) {
+                // Basic for now, print the stack trace and trhow it
+                excep.printStackTrace();
+                throw excep;
+            }
+        }
+        return profiles;
+    }
 }

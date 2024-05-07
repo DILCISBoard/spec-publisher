@@ -1,0 +1,28 @@
+<table>
+  <caption>{{ caption }}</caption>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name, Location &amp; Description</th>
+      <th>Card &amp; Level</th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#requirements}}
+    <tr>
+      <td><a name="{{ id }}">{{ id }}</a></td>
+      <td>
+        <strong>{{ details.name }}</strong><br/>
+        {{#xPath}}`{{ xPath }}`{{/xPath}}{{^xPath}}`N/A`{{/xPath}}
+        {{#description}}
+        <br/>{{.}}
+        {{/description}}
+      </td>
+      <td>
+        <strong>{{ cardinality }}</strong><br/>
+        {{ details.level }}
+      </td>
+    </tr>
+  {{/requirements}}
+  </tbody>
+</table>
