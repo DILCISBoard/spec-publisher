@@ -1,4 +1,4 @@
-package eu.dilcis.csip.out;
+package eu.dilcis.csip.profile;
 
 import java.util.Arrays;
 import java.util.Enumeration;

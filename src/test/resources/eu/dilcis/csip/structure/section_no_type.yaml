@@ -1,4 +1,4 @@
 ---
 - name: context
-  path: context/index.md
+  source: context/index.md
 

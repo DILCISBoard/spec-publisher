@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -21,9 +20,8 @@ import org.yaml.snakeyaml.Yaml;
 import eu.dilcis.csip.profile.MetsProfile;
 import eu.dilcis.csip.profile.MetsProfileParser;
 import eu.dilcis.csip.profile.Profiles;
+import eu.dilcis.csip.profile.Requirement;
 import eu.dilcis.csip.structure.SpecificationStructure.Part;
-import eu.dilcis.csip.structure.SpecificationStructure.Section;
-import eu.dilcis.csip.structure.SpecificationStructure.Table;
 
 public class StructFileParserTest {
     private static MetsProfileParser profileParser = MetsProfileParser.newInstance();
@@ -116,10 +114,9 @@ public class StructFileParserTest {
         SpecificationStructure structure = parser.fromYamlStream(is, STRUCT_ROOT);
         assertNotNull(structure);
         assertEquals("Parsed Structure should have 1 section", 1, structure.content.size());
-        Section section = structure.content.get(Part.BODY).get(0);
+        Source section = structure.content.get(Part.BODY).get(0);
         assertNotNull(section);
         assertEquals("context", section.name);
-        assertTrue(Files.isRegularFile(section.source));
     }
 
     @Test(expected = ParseException.class)
@@ -159,12 +156,6 @@ public class StructFileParserTest {
     }
 
     @Test(expected = ParseException.class)
-    public void testTableFromYamlStreamNoPath() throws ParseException {
-        InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/table_no_path.yaml");
-        parser.fromYamlStream(is, STRUCT_ROOT);
-    }
-
-    @Test(expected = ParseException.class)
     public void testTableFromYamlStreamDirPath() throws ParseException {
         InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/table_dir_path.yaml");
         parser.fromYamlStream(is, STRUCT_ROOT);
@@ -175,13 +166,29 @@ public class StructFileParserTest {
         InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/table.yaml");
         final List<Map<String, Object>> mapList = new Yaml().load(is);
 
-        Table table = StructFileParser.tableFromMap(Path.of("."), (String) mapList.get(0).get("name"), mapList.get(0));
+        RequirementsSource table = SourceFactory.requirementsFromMap(Arrays.asList(new MetsProfile[] { geoProfile }),
+                (String) mapList.get(0).get("name"), mapList.get(0));
         assertNotNull(table);
         assertEquals("requirements.METS.package", table.name);
         assertEquals("Table should have 6 requirments.", 6, table.requirements.size());
-        assert table.requirements.contains(Profiles.requirementIdFromString("GEO_3"));
-        assert table.requirements.contains(Profiles.requirementIdFromString("GEO_4"));
-        assert table.requirements.contains(Profiles.requirementIdFromString("GEO_6"));
+        assert table.requirements.contains(getRequirement("GEO_3", geoProfile));
+        assert table.requirements.contains(getRequirement("GEO_4", geoProfile));
+        assert table.requirements.contains(getRequirement("GEO_6", geoProfile));
+    }
+
+    @Test
+    public void testSectionTableFromSource() throws ParseException {
+        InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/table_mets_section.yaml");
+        final List<Map<String, Object>> mapList = new Yaml().load(is);
+
+        RequirementsSource table = SourceFactory.requirementsFromMap(Arrays.asList(new MetsProfile[] { csipProfile }),
+                (String) mapList.get(0).get("name"), mapList.get(0));
+        assertNotNull(table);
+        assertEquals("requirements.METS.package", table.name);
+        assertEquals("Table should have 6 requirments.", 6, table.requirements.size());
+        assert table.requirements.contains(getRequirement("CSIP1", csipProfile));
+        assert table.requirements.contains(getRequirement("CSIP3", csipProfile));
+        assert table.requirements.contains(getRequirement("CSIP6", csipProfile));
     }
 
     @Test
@@ -190,10 +197,9 @@ public class StructFileParserTest {
         SpecificationStructure structure = parser.fromYamlStream(is, STRUCT_ROOT);
         assertNotNull(structure);
         assertEquals("Parsed Structure should have 6 sections", 6, structure.content.get(Part.BODY).size());
-        for (SpecificationStructure.Section section : structure.content.get(Part.BODY)) {
+        for (Source section : structure.content.get(Part.BODY)) {
             assertNotNull(section);
             assertNotNull(section.name);
-            assertNotNull(section.source);
             assertNotNull(section.type);
         }
     }
@@ -202,14 +208,17 @@ public class StructFileParserTest {
     public void testTableGenerator() throws ParseException, IOException {
         InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/struct_test.yaml");
         SpecificationStructure structure = parser.fromYamlStream(is, STRUCT_ROOT);
-        for (SpecificationStructure.Section section : structure.content.get(Part.BODY)) {
-            if (section instanceof Table) {
-                Table table = (Table) section;
-                String html = SpecificationStructure.htmlTable(table, Arrays.asList(new MetsProfile[] { geoProfile }));
+        for (Source section : structure.content.get(Part.BODY)) {
+            if (section instanceof RequirementsSource) {
+                RequirementsSource table = (RequirementsSource) section;
+                String html = SpecificationStructure.tableStringFromTemplate(table);
                 assertNotNull(html);
-                assertTrue(html.contains("<table>"));
-                assertTrue(html.contains("</table>"));
+                assertTrue(html.contains("Name, Location & Description"));
             }
         }
+    }
+
+    private static final Requirement getRequirement(final String id, final MetsProfile profile) {
+        return profile.getRequirementById(Profiles.requirementIdFromString(id));
     }
 }

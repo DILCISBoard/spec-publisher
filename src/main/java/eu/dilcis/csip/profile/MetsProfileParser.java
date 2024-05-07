@@ -5,7 +5,9 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -16,8 +18,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.NamespaceSupport;
 
-import eu.dilcis.csip.out.OutputHandler;
-import eu.dilcis.csip.out.XmlCharBuffer;
 import eu.dilcis.csip.profile.MetsProfile.Details;
 
 /**
@@ -56,10 +56,15 @@ public final class MetsProfileParser extends DefaultHandler {
     private boolean inRequirement = false;
     private boolean inExtSchema = false;
     private boolean inVocab = false;
+    private boolean inExample = false;
     private boolean inTool = false;
+    private boolean inAppendix = false;
     private String currDefTerm = null;
     private NamespaceSupport namespaces = new NamespaceSupport();
     private Requirement.Builder reqBuilder = new Requirement.Builder();
+    private ControlledVocabulary.Builder vocabBuilder;
+    private Appendix.Builder appBuilder;
+    private Example.Builder exBuilder;
     private Section currentSect;
     private boolean needNewContext = true;
 
@@ -70,6 +75,10 @@ public final class MetsProfileParser extends DefaultHandler {
     private String profileTitle;
 
     private final List<Requirement> requirements = new ArrayList<>();
+    private final Map<String, Example> examples = new HashMap<>();
+    private final List<Appendix> appendices = new ArrayList<>();
+    private final List<ExternalSchema> extSchemas = new ArrayList<>();
+    private final List<ControlledVocabulary> vocabs = new ArrayList<>();
 
     private MetsProfileParser() {
         super();
@@ -82,7 +91,8 @@ public final class MetsProfileParser extends DefaultHandler {
             throw new IllegalArgumentException(String.format(Constants.MESS_NULL_PARAM, "profilePath", "File"));
         this.initialise();
         saxParser.parse(profilePath.toFile(), this);
-        return MetsProfile.fromValues(Details.fromValues(profileUri, profileTitle), null, requirements);
+        return MetsProfile.fromValues(Details.fromValues(profileUri, profileTitle), null, requirements,
+                examples, appendices, extSchemas, vocabs);
     }
 
     @Override
@@ -118,8 +128,19 @@ public final class MetsProfileParser extends DefaultHandler {
         } else if (XmlConstants.EXTSCHEMA_ELE.equals(this.currentElementName)) {
             this.inExtSchema = true;
             this.schemaBuilder = new ExternalSchema.Builder();
+        } else if (XmlConstants.EXAMPLE_ELE.equals(this.currentElementName)) {
+            this.exBuilder = new Example.Builder(attrs);
+            this.inExample = true;
+        } else if (this.inExample) {
+            this.exBuilder.eleStart(this.currentElementName, attrs, namespaces);
         } else if (XmlConstants.VOCAB_ELE.equals(this.currentElementName)) {
             this.inVocab = true;
+            this.vocabBuilder = new ControlledVocabulary.Builder();
+            this.vocabBuilder.id(Utilities.getId(attrs));
+        } else if (XmlConstants.APPENDIX_ELE.equals(this.currentElementName)) {
+            this.startAppendix(attrs);
+        } else if (this.inAppendix) {
+            this.appBuilder.eleStart(this.currentElementName, attrs, this.namespaces);
         } else if (XmlConstants.TOOL_ELE.equals(this.currentElementName)) {
             this.inTool = true;
         }
@@ -136,32 +157,35 @@ public final class MetsProfileParser extends DefaultHandler {
             this.processRequirementChild();
         } else if (XmlConstants.EXTSCHEMA_ELE.equals(this.currentElementName)) {
             this.inExtSchema = false;
-            this.schemaBuilder.build();
-        } else if (XmlConstants.VOCAB_ELE.equals(this.currentElementName)) {
-            this.inVocab = false;
-        } else if (XmlConstants.TOOL_ELE.equals(this.currentElementName)) {
-            this.inTool = false;
+            this.extSchemas.add(this.schemaBuilder.build());
         } else if (this.inExtSchema) {
             this.processSchemaEle();
-        } else if (XmlConstants.URI_ELE.equals(this.currentElementName) && !(this.inVocab || this.inTool)) {
+        } else if (XmlConstants.VOCAB_ELE.equals(this.currentElementName)) {
+            this.inVocab = false;
+            this.vocabs.add(this.vocabBuilder.build());
+        } else if (this.inVocab) {
+            this.processVocabEle();
+        } else if (XmlConstants.TOOL_ELE.equals(this.currentElementName)) {
+            this.inTool = false;
+        } else if (XmlConstants.EXAMPLE_ELE.equals(this.currentElementName)) {
+            this.inExample = false;
+            final Example ex = this.exBuilder.build();
+            this.examples.put(ex.id, ex);
+        } else if (this.inExample) {
+            this.exBuilder.eleEnd(this.currentElementName,
+                    this.charBuff.voidBuffer());
+        } else if (XmlConstants.URI_ELE.equals(this.currentElementName) && !this.inTool) {
             this.profileUri = URI.create(this.charBuff.getBufferValue());
         } else if (XmlConstants.TITLE_ELE.equals(this.currentElementName)) {
             this.profileTitle = this.charBuff.getBufferValue();
+        } else if (XmlConstants.APPENDIX_ELE.equals(this.currentElementName)) {
+            this.inAppendix = false;
+            this.appendices.add(this.appBuilder.build());
+        } else if (this.inAppendix) {
+            this.appBuilder.eleEnd(this.currentElementName, this.charBuff.voidBuffer());
         }
         this.charBuff.voidBuffer();
         this.currentElementName = null;
-    }
-
-    @Override
-    public void endDocument() throws SAXException {
-        try {
-
-            final OutputHandler outHandler = OutputHandler.toStdOut();
-            outHandler.emit("Total Requirements: " + this.requirements.size()); //$NON-NLS-1$
-            outHandler.nl();
-        } catch (final IOException excep) {
-            throw new SAXException(Constants.MESS_IO_EXCEP, excep);
-        }
     }
 
     @Override
@@ -177,9 +201,13 @@ public final class MetsProfileParser extends DefaultHandler {
         this.profileUri = URI.create(Constants.DEFAULT_URI);
         this.profileTitle = Constants.EMPTY;
         this.requirements.clear();
+        this.appendices.clear();
         this.namespaces = new NamespaceSupport();
         this.reqBuilder = new Requirement.Builder();
         this.charBuff.voidBuffer();
+        this.inAppendix = this.inExample = this.inExtSchema = this.inRequirement = this.inTool = this.inVocab = false;
+        this.examples.clear();
+        this.extSchemas.clear();
     }
 
     private void processRequirementAttrs(final Attributes attrs) {
@@ -207,19 +235,8 @@ public final class MetsProfileParser extends DefaultHandler {
     private void processRequirementChildStart(final Attributes eleAtts) {
         if (XmlConstants.ANCHOR_ELE.equals(this.currentElementName)) {
             this.reqBuilder.descPart(this.charBuff.getBufferValue());
-            this.currentHref = this.getHref(eleAtts);
+            this.currentHref = Utilities.getHref(eleAtts);
         }
-    }
-
-    private String getHref(final Attributes attrs) {
-        if (attrs == null)
-            return null;
-        for (int i = 0; i < attrs.getLength(); i++) {
-            final String aName = attrs.getLocalName(i); // Attr name
-            if ("href".equals(aName))
-                return attrs.getValue(i);
-        }
-        return null;
     }
 
     private void processRequirementChild() {
@@ -265,7 +282,34 @@ public final class MetsProfileParser extends DefaultHandler {
         }
     }
 
+    private void processVocabEle() {
+        switch (this.currentElementName) {
+            case XmlConstants.NAME_ELE:
+                this.vocabBuilder.name(this.charBuff.getBufferValue());
+                break;
+            case XmlConstants.MAINT_ELE:
+                this.vocabBuilder.maintenanceAgency(this.charBuff.getBufferValue());
+                break;
+            case XmlConstants.URI_ELE:
+                this.vocabBuilder.uri(this.charBuff.getBufferValue());
+                break;
+            case XmlConstants.CONTEXT_ELE:
+                this.vocabBuilder.context(this.charBuff.getBufferValue());
+                break;
+            case XmlConstants.PARA_ELE:
+                this.vocabBuilder.description(this.charBuff.getBufferValue());
+                break;
+            default:
+                break;
+        }
+    }
+
     private void startSection() {
         this.currentSect = Section.fromEleName(this.currentElementName);
+    }
+
+    private void startAppendix(final Attributes attrs) {
+        this.inAppendix = true;
+        this.appBuilder = new Appendix.Builder(attrs);
     }
 }

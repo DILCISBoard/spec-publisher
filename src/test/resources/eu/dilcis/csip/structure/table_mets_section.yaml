@@ -2,10 +2,4 @@
 - name: requirements.METS.package
   type: requirements
   heading: "Table 3: Requirements for the information package"
-  requirements:
-    - GEO_2
-    - 
-    - GEO_4
-    - GEO_5
-    - GEO_6
-    - GEO_7
+  section: metsRootElement

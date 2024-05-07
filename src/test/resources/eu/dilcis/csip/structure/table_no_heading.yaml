@@ -1,7 +1,6 @@
 
 - name: requirements.METS.package
-  type: table
-  path: "requirements/METS/package/requirements.md"
+  type: requirements
   requirements:
     - GEO_2
     - GEO_3

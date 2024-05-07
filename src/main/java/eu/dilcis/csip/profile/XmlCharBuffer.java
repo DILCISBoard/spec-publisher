@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.dilcis.csip.out;
+package eu.dilcis.csip.profile;
 
 /**
  * @author cfw

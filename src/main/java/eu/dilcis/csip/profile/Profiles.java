@@ -1,5 +1,10 @@
 package eu.dilcis.csip.profile;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import eu.dilcis.csip.profile.Requirement.RequirementId;
 
 public class Profiles {
@@ -9,6 +14,19 @@ public class Profiles {
 
     public static final MetsProfileParser metsProfileParser() {
         return MetsProfileParser.getInstance();
+    }
+
+    public static final Set<Example> examplesFromRequirments(final Collection<MetsProfile> profiles,
+            final List<Requirement> requirements) {
+        final Set<Example> examples = new HashSet<>();
+        for (final Requirement requirement : requirements) {
+            for (final MetsProfile profile : profiles) {
+                for (final String exampleId : requirement.examples) {
+                    examples.add(profile.getExampleById(exampleId));
+                }
+            }
+        }
+        return examples;
     }
 
     private Profiles() {

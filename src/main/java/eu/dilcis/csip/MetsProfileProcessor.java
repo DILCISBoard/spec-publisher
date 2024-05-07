@@ -8,6 +8,7 @@ import java.io.Writer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
@@ -16,10 +17,11 @@ import org.xml.sax.SAXException;
 import eu.dilcis.csip.profile.MetsProfile;
 import eu.dilcis.csip.profile.MetsProfileParser;
 import eu.dilcis.csip.structure.ParseException;
+import eu.dilcis.csip.structure.Source;
 import eu.dilcis.csip.structure.SpecificationStructure;
 import eu.dilcis.csip.structure.SpecificationStructure.Part;
-import eu.dilcis.csip.structure.SpecificationStructure.Section;
 import eu.dilcis.csip.structure.StructFileParser;
+import eu.dilcis.csip.structure.Utilities;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -74,16 +76,22 @@ public final class MetsProfileProcessor implements Callable<Integer> {
         try {
             final StructFileParser structParser = StructFileParser.parserInstance(this.processProfiles());
             final SpecificationStructure specStructure = structParser.parseStructureFile(this.structureFile.toPath());
-            specStructure.serialiseSiteStructure(structParser.getProfiles());
-            for (Entry<Part, List<Section>> entry : specStructure.content.entrySet()) {
+            boolean isFirst = true;
+            for (Entry<Part, List<Source>> entry : specStructure.content.entrySet()) {
                 try (Writer writer = new FileWriter(this.destination.resolve(entry.getKey().getFileName()).toFile())) {
                     if (Part.BODY.equals(entry.getKey())) {
                         writer.write("!TOC\n\n");
                     }
-                    for (Section section : entry.getValue()) {
-                        try (FileReader reader = new FileReader(section.source.toFile())) {
-                            reader.transferTo(writer);
+                    for (Source section : entry.getValue()) {
+                        if (Part.APPENDICES.equals(entry.getKey())) {
+                            Map<String, Object> context = new java.util.HashMap<>();
+                            context.put("heading", section.heading);
+                            context.put("label", section.label);
+                            context.put("isFirst", isFirst);
+                            isFirst = false;
+                            Utilities.serialiseToTemplate("eu/dilcis/csip/out/appendix_heading.mustache", context, writer);
                         }
+                        section.serialise(writer, false);
                         writer.write("\n");
                     }
                     if (Part.BODY.equals(entry.getKey())) {
@@ -92,14 +100,11 @@ public final class MetsProfileProcessor implements Callable<Integer> {
                     writer.flush();
                 }
             }
-            specStructure.serialisePdfStructure(structParser.getProfiles());
-            for (Entry<Part, List<Section>> entry : specStructure.content.entrySet()) {
+            for (Entry<Part, List<Source>> entry : specStructure.content.entrySet()) {
                 try (Writer writer = new FileWriter(
                         this.destination.resolve("../pdf").resolve(entry.getKey().getFileName()).toFile())) {
-                    for (Section section : entry.getValue()) {
-                        try (FileReader reader = new FileReader(section.source.toFile())) {
-                            reader.transferTo(writer);
-                        }
+                    for (Source section : entry.getValue()) {
+                        section.serialise(writer, true);
                         writer.write("\n");
                     }
                     if (Part.BODY.equals(entry.getKey())) {

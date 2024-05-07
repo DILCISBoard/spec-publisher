@@ -1,3 +1,3 @@
 ---
-- type: markdown
-  path: context/index.md
+- type: file
+  source: context/index.md

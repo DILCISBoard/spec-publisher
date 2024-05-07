@@ -2,8 +2,10 @@ package eu.dilcis.csip.profile;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public final class Requirement {
     public static final class RequirementId implements Comparable<RequirementId> {
@@ -97,6 +99,10 @@ public final class Requirement {
         public final Section section;
 
         private Details(final String name, final Section section, final Level level) {
+            if (name == null)
+                throw new IllegalArgumentException("Name cannot be null.");
+            if (section == null)
+                throw new IllegalArgumentException("Section cannot be null.");
             this.name = name;
             this.section = section;
             this.level = level;
@@ -153,7 +159,7 @@ public final class Requirement {
         private Section section;
         private String relMat;
         private List<String> description;
-        private List<String> examples;
+        private Set<String> exampleIds;
         private String xPath = "N/A";
         private String cardinality;
         private String descParts = "";
@@ -174,7 +180,7 @@ public final class Requirement {
             this.level = req.details.level;
             this.relMat = req.relMat;
             this.description = new ArrayList<>(req.description);
-            this.examples = new ArrayList<>(req.examples);
+            this.exampleIds = new HashSet<>(req.examples);
             this.xPath = req.xPath;
             this.cardinality = req.cardinality;
         }
@@ -281,8 +287,8 @@ public final class Requirement {
          * @param examples
          *                 the examples to set
          */
-        public Builder examples(final List<String> xmpls) {
-            this.examples = new ArrayList<>(xmpls);
+        public Builder examples(final Set<String> xmpls) {
+            this.exampleIds = new HashSet<>(xmpls);
             return this;
         }
 
@@ -291,7 +297,7 @@ public final class Requirement {
          *                the example to add
          */
         public Builder example(final String xmpl) {
-            this.examples.add(xmpl);
+            this.exampleIds.add(xmpl);
             return this;
         }
 
@@ -334,7 +340,7 @@ public final class Requirement {
                 this.description.add(this.descParts);
             }
             return new Requirement(this.id, new Details(this.name, this.section, this.level),
-                    this.relMat, this.description, this.examples, this.xPath,
+                    this.relMat, this.description, this.exampleIds, this.xPath,
                     this.cardinality);
         }
     }
@@ -345,12 +351,12 @@ public final class Requirement {
     public final Details details;
     final String relMat;
     public final List<String> description;
-    final List<String> examples;
+    final Set<String> examples;
     public final String xPath;
     public final String cardinality;
 
     Requirement(final RequirementId id, final Details details, final String relMat,
-            final List<String> description, final List<String> examples,
+            final List<String> description, final Set<String> examples,
             final String xPath, final String cardinality) {
         super();
         this.id = id;
@@ -365,11 +371,32 @@ public final class Requirement {
     private Requirement() {
         this(RequirementId.DEFAULT_ID, new Details(Constants.EMPTY, Section.ROOT,
                 Level.MAY), Constants.EMPTY, Collections.emptyList(),
-                Collections.emptyList(), Constants.EMPTY, Constants.EMPTY);
+                Collections.emptySet(), Constants.EMPTY, Constants.EMPTY);
     }
 
     public RequirementId getId() {
         return this.id;
+    }
+
+    public List<String> getLocation() {
+        if (xPath.length() < 61) {
+            return Collections.singletonList(xPath);
+        }
+        final String[] loc = this.xPath.split("/"); //$NON-NLS-1$ ")
+        List<String> location = new ArrayList<>();
+        StringBuilder locBuff = new StringBuilder();
+        for (int i = 0; i < loc.length; i++) {
+            if (locBuff.length() + loc[i].length() < 61) {
+                locBuff.append(loc[i]).append("/"); //$NON-NLS-1$
+            } else {
+                location.add(locBuff.toString());
+                locBuff = new StringBuilder();
+                locBuff.append(loc[i]).append("/"); // $NON-NLS-1$
+            }
+        }
+        locBuff.setLength(locBuff.length() - 1);
+        location.add(locBuff.toString());
+        return location;
     }
 
     public String[] relatedMatter() {

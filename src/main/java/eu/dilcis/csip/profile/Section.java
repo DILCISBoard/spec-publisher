@@ -17,12 +17,7 @@ public enum Section {
       // //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
     public static boolean isSection(final String eleName) {
-        for (final Section sect : Section.values()) {
-            if (sect.eleName.equals(eleName)) {
-                return true;
-            }
-        }
-        return false;
+        return fromEleName(eleName) != null;
     }
 
     public static Section fromEleName(final String eleName) {
