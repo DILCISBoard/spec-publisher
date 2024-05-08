@@ -8,7 +8,7 @@ public class XmlConstants {
     static final String EXTSCHEMA_ELE = "external_schema"; //$NON-NLS-1$
     static final String MAINT_ELE = "maintenance_agency"; //$NON-NLS-1$
     static final String NAME_ELE = "name"; //$NON-NLS-1$
-    static final String TEST_STRING_ELE = "testString"; //$NON-NLS-1$
+    static final String TEST_XML_ELE = "testXML"; //$NON-NLS-1$
     static final String URI_ELE = "URI"; //$NON-NLS-1$
     static final String URL_ELE = "URL"; //$NON-NLS-1$
     static final String VOCAB_ELE = "vocabulary"; //$NON-NLS-1$
