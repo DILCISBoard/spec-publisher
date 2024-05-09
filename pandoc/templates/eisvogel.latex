@@ -223,6 +223,9 @@ $if(colorlinks)$
 \definecolor{default-citecolor}{HTML}{4077C0}
 \definecolor{default-urlcolor}{HTML}{4077C0}
 $endif$
+\usepackage{xcolor}
+\definecolor{pathlight}{HTML}{d60766}
+
 \usepackage{hyperref}
 \hypersetup{
 $if(title-meta)$
@@ -776,7 +779,7 @@ the auspices of the DLM Forum.
 \end{minipage}%
 \begin{minipage}{.5\textwidth}
   \centering
-  \includegraphics[width=2.21654in,height=1.09333in]{$logo$}
+  \includegraphics[width=2.21654in,height=1.09333in]{$dilcis-logo$}
 \end{minipage}
 \end{figure}
 \vskip 1em
