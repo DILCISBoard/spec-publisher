@@ -47,7 +47,12 @@ final class RequirementsSource extends Source {
     public void serialise(final Writer destination, final boolean isPdf) throws IOException {
         Utilities.serialiseToTemplate("eu/dilcis/csip/out/table_markdown.mustache",
                 Map.of("requirements", this.requirements, "caption", this.heading, "examples", this.examples, "pdf",
-                        isPdf),
+                        isPdf, "headed", isHeaded()),
                 destination);
+    }
+
+    @Override
+    public boolean isHeaded() {
+        return this.heading.startsWith("###");
     }
 }
