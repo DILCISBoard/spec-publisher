@@ -44,6 +44,10 @@ public abstract class Source {
         return Objects.hash(type, name, heading, label);
     }
 
+    public boolean isHeaded() {
+        return false;
+    }
+
     @Override
     public final boolean equals(final Object obj) {
         if (this == obj)
