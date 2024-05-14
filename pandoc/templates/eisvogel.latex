@@ -757,10 +757,17 @@ $if(subtitle)$
 {\Large \textsf{$subtitle$}}
 $endif$
 \vskip 1.5em
-\includegraphics[width=1.56693in,height=1.08268in]{$eu-logo$}
-\vskip 2em
-\includegraphics[width=1.23774in,height=1.2375in]{$eark-logo$}
-\end{center}
+\begin{figure}
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=1.56693in,height=1.08268in]{$eu-logo$}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=1.23774in,height=1.2375in]{$eark-logo$}
+\end{minipage}
+\end{figure}
 \vskip 1.5em
 The European Commission eArchiving procurement recognizes the E-ARK
 specifications as the eArchiving specifications which are funded under
@@ -770,6 +777,7 @@ CNECT/LUX/2021/OP/0077.
 This specification is published, supported, and developed by the Digital
 Information LifeCycle Interoperability Standards (DILCIS) Board under
 the auspices of the DLM Forum.
+\end{center}
 \vskip 1em
 \begin{figure}
 \centering
@@ -783,16 +791,21 @@ the auspices of the DLM Forum.
 \end{minipage}
 \end{figure}
 \vskip 1em
+\begin{center}
+\includegraphics[width=1.49606in,height=0.31102in]{$cc-by$}\\
+This specification is maintained by Digital Information LifeCycle Interoperability Standards Board and is licensed under CC BY 4.0
+\vskip 1em
 \includegraphics[width=1.49606in,height=0.31102in]{$cofund$}
 
 This specification was previously developed with the support of the
 European Union:
 
-{\small\color{gray}\setstretch{0.5}
+{\small\color{gray}\setstretch{1.0}
 E-ARK Grant No: 620998 CIP-ICT-PSP.2013.2.5\\
 E-ARK4ALL Agreement No. LC-00921441 CEF-TC-2018-15\\
 E-ARK3 Agreement No. LC-01390244 CEF-TC-2019-3\\
 }
+\end{center}
 \pagebreak
 
 $if(abstract)$
