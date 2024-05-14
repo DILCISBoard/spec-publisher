@@ -68,25 +68,15 @@ li.dropdown {
 section.copyright {
   border-top: 1px solid #eeeeee;
   font-size: 12px;
-  padding: 40px 0 80px;
+  padding: 30px 0 30px;
   background: #f7f7f7;
   color: #666666;
   line-height: 1.42857143;
-  font-size: 12px;
-}
-
-.custom h5 {
-  font-size: 14px;
-}
-
-.custom h6 {
-  font-size: 12px;
 }
 
 .container img {
   max-width: 100%;
   box-sizing: content-box;
-  background-color: #fff;
 }
 
 .container > table {
@@ -132,7 +122,6 @@ section.copyright {
 .container table tr:nth-child(2n) {
     background-color: #f6f8fa;
 }
-
 td code.highlighter-rouge {
   color: #d60766;
 }
