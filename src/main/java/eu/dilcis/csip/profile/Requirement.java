@@ -161,7 +161,7 @@ public final class Requirement {
         private List<String> description;
         private Set<String> exampleIds;
         private String xPath = "N/A";
-        private String cardinality;
+        private String cardinality = "N/A";
         private String descParts = "";
 
         public Builder() {
@@ -379,6 +379,9 @@ public final class Requirement {
     }
 
     public List<String> getLocation() {
+        if (xPath.length() < 1) {
+            return Collections.singletonList("N/A");
+        }
         if (xPath.length() < 61) {
             return Collections.singletonList(xPath);
         }
