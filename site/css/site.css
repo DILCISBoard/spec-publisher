@@ -68,25 +68,15 @@ li.dropdown {
 section.copyright {
   border-top: 1px solid #eeeeee;
   font-size: 12px;
-  padding: 40px 0 80px;
+  padding: 30px 0 30px;
   background: #f7f7f7;
   color: #666666;
   line-height: 1.42857143;
-  font-size: 12px;
-}
-
-.custom h5 {
-  font-size: 14px;
-}
-
-.custom h6 {
-  font-size: 12px;
 }
 
 .container img {
   max-width: 100%;
   box-sizing: content-box;
-  background-color: #fff;
 }
 
 .container > table {
@@ -99,13 +89,11 @@ section.copyright {
   font-size: 16px;
   line-height: 1.5;
 }
-
 .container thead {
   display: table-header-group;
   vertical-align: middle;
   border-color: inherit;
 }
-
 .container tr {
   background-color: #fff;
   border-top: 1px solid #c6cbd1;
@@ -114,7 +102,6 @@ section.copyright {
   vertical-align: inherit;
   border-color: inherit;
 }
-
 .container th {
   padding: 6px 13px;
   border: 1px solid #dfe2e5;
@@ -123,22 +110,37 @@ section.copyright {
   vertical-align: inherit;
   text-align: -internal-center;
 }
-
 .container tbody {
   display: table-row-group;
   vertical-align: middle;
   border-color: inherit;
 }
-
 .container td {
   padding: 6px 13px;
   border: 1px solid #dfe2e5;
 }
-
 .container table tr:nth-child(2n) {
     background-color: #f6f8fa;
 }
-
 td code.highlighter-rouge {
   color: #d60766;
+}
+
+blockquote {
+  background: #f9f9f9;
+  border-left: 10px solid #ccc;
+  margin: 1.5em 10px;
+  padding: 0.5em 10px;
+  quotes: "\201C""\201D""\2018""\2019";
+}
+blockquote:before {
+  color: #ccc;
+  content: "\201C";
+  font-size: 4em;
+  line-height: 0.1em;
+  margin-right: 0.25em;
+  vertical-align: -0.4em;
+}
+blockquote p {
+  display: inline;
 }

@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Objects;
 
-import eu.dilcis.csip.structure.Source.SourceType;
-
 public abstract class Source {
     enum SourceType {
         FILE, REQUIREMENTS, METS;
-    
+
         static final SourceType fromString(final String type) throws ParseException {
             if (type != null) {
                 for (final SourceType st : SourceType.values()) {
@@ -20,7 +18,7 @@ public abstract class Source {
             }
             throw new ParseException("Invalid type: " + type);
         }
-    
+
         public String delimitedName() {
             return this.name().toLowerCase() + ".";
         }
@@ -44,6 +42,10 @@ public abstract class Source {
     @Override
     public final int hashCode() {
         return Objects.hash(type, name, heading, label);
+    }
+
+    public boolean isHeaded() {
+        return false;
     }
 
     @Override

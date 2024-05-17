@@ -1,3 +1,7 @@
+{{#headed}}
+{{{ caption }}}
+
+{{/headed}}
 {{^pdf}}
 |  ID     | Name, Location & Description | Card & Level |
 | ------- | ---------------------------- | ------------ |
@@ -10,7 +14,7 @@
 |  ID  |  Name, Location & Description    | Card & Level |
 | ---- | -------------------------------- | --------|
 <%#requirements%>
-| <a name="<% id %>"/>**<% id %>** | \vtop{\hbox{\strut \textbf{<%={{ }}=%>{{{ details.name }}}{{=<% %>=}}}}<%#location%>\hbox{\strut \small \texttt{<%={{ }}=%>{{{ . }}}{{=<% %>=}}}}<%/location%><%^xPath%>\hbox{\strut \small \texttt{N/A}}<%/xPath%>}<%={{ }}=%>{{#description}}{{{ . }}}<br/>{{/description}}{{=<% %>=}} | \vtop{\hbox{\strut \textbf{<% cardinality %>}}\hbox{\strut <% details.level %>}} |
+| <a name="<% id %>"/>**<% id %>** | \vtop{\hbox{\strut \textbf{<%={{ }}=%>{{{ details.name }}}{{=<% %>=}}}}<%#location%>\hbox{\strut \small \color{pathlight} \texttt{<%={{ }}=%>{{{ . }}}{{=<% %>=}}}}<%/location%><%^xPath%>\hbox{\strut \small \texttt{N/A}}<%/xPath%>}<%={{ }}=%>{{#description}}{{{ . }}}<br/>{{/description}}{{=<% %>=}} | \vtop{\hbox{\strut \textbf{<% cardinality %>}}\hbox{\strut <% details.level %>}} |
 <%/requirements%>
 <%={{ }}=%>
 {{/pdf}}
