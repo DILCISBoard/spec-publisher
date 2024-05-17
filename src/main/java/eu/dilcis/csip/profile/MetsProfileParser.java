@@ -251,6 +251,9 @@ public final class MetsProfileParser extends DefaultHandler {
                 this.reqBuilder.defPair(this.currDefTerm,
                         this.charBuff.getBufferValue());
                 break;
+            case XmlConstants.TEST_XML_ELE:
+                this.reqBuilder.xPath(this.charBuff.getBufferValue());
+                break;
             case XmlConstants.PARA_ELE:
                 this.reqBuilder.description(this.charBuff.getBufferValue());
                 break;
