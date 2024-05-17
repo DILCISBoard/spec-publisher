@@ -6,7 +6,7 @@
 |  ID     | Name, Location & Description | Card & Level |
 | ------- | ---------------------------- | ------------ |
 {{#requirements}}
-| <a name="{{ id }}"/>**{{ id }}** | **{{{ details.name }}}**<br/>{{#xPath}}`{{{ xPath }}}`{{/xPath}}{{^xPath}}`N/A`{{/xPath}}{{#description}}<br/>{{{.}}}{{/description}} | **{{ cardinality }}**<br/>{{ details.level }} |
+| <a name="{{ id }}"/>**{{ id }}** | **{{{ details.name }}}**<br/>{{#xPath}}`{{{ xPath }}}`{{/xPath}}{{^xPath}}`N/A`{{/xPath}}{{#description}}<br/>{{{.}}}{{/description}} | **{{#cardinality}}{{ cardinality }}{{/cardinality}}{{^cardinality}}N/A{{/cardinality}}**<br/>{{ details.level }} |
 {{/requirements}}
 {{/pdf}}
 {{#pdf}}
@@ -14,7 +14,7 @@
 |  ID  |  Name, Location & Description    | Card & Level |
 | ---- | -------------------------------- | --------|
 <%#requirements%>
-| <a name="<% id %>"/>**<% id %>** | \vtop{\hbox{\strut \textbf{<%={{ }}=%>{{{ details.name }}}{{=<% %>=}}}}<%#location%>\hbox{\strut \small \color{pathlight} \texttt{<%={{ }}=%>{{{ . }}}{{=<% %>=}}}}<%/location%><%^xPath%>\hbox{\strut \small \texttt{N/A}}<%/xPath%>}<%={{ }}=%>{{#description}}{{{ . }}}<br/>{{/description}}{{=<% %>=}} | \vtop{\hbox{\strut \textbf{<% cardinality %>}}\hbox{\strut <% details.level %>}} |
+| <a name="<% id %>"/>**<% id %>** | \vtop{\hbox{\strut \textbf{<%={{ }}=%>{{{ details.name }}}{{=<% %>=}}}}<%#location%>\hbox{\strut \small \color{pathlight} \texttt{<%={{ }}=%>{{{ . }}}{{=<% %>=}}}}<%/location%><%^location%>\hbox{\strut \small \texttt{N/A}}<%/location%>}<%={{ }}=%>{{#description}}{{{ . }}}<br/>{{/description}}{{=<% %>=}} | \vtop{\hbox{\strut \textbf{<%#cardinality%><% cardinality %><%/cardinality%><%^cardinality%>N/A<%/cardinality%>}}\hbox{\strut <% details.level %>}} |
 <%/requirements%>
 <%={{ }}=%>
 {{/pdf}}
