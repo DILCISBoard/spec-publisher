@@ -1,0 +1,20 @@
+---
+margin-left:  0.5in
+margin-right: 0.5in
+
+titlepage: true
+titlepage-color: "186b9e"
+titlepage-text-color: "3adeca"
+titlepage-rule-color: "3adeca"
+titlepage-rule-height: 1
+cofund: "./img/cofund.jpg"
+dilcis-logo: "./img/dilcis-logo.png"
+dlm-logo: "./img/dlm-logo.png"
+eark-logo: "./img/eark-logo.jpg"
+eu-logo: "./img/eu-logo.png"
+cc-by: "./img/cc-by.png"
+toc-title: "Table of contents"
+header-right:	DILCIS Board
+autoSectionLabels: True
+listings-disable-line-numbers: True
+...
