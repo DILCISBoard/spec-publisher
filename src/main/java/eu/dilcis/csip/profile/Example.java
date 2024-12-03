@@ -25,7 +25,7 @@ public final class Example {
 
         Builder(Attributes attributes) {
             this.id = Utilities.getId(attributes);
-            this.label = (Utilities.getLabel(attributes));
+            this.label = Utilities.getLabel(attributes);
         }
 
         Builder id(String id) {
