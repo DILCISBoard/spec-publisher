@@ -21,7 +21,9 @@ public final class Requirement {
             boolean isPrefix = true;
             for (int i = 0; i < idString.length(); i++) {
                 final char c = idString.charAt(i);
-                if (Character.isDigit(c)) {
+                // TODO: This is a hack fix for IDs that have a number in the prefix,
+                // specifically the "3DPM" prefix for CITS-3DPM
+                if (Character.isDigit(c) && i > 2) {
                     numBuff.append(c);
                     isPrefix = false;
                 } else if (isPrefix) {
