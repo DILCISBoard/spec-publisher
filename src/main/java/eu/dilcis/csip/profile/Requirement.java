@@ -23,7 +23,7 @@ public final class Requirement {
                 final char c = idString.charAt(i);
                 // TODO: This is a hack fix for IDs that have a number in the prefix,
                 // specifically the "3DPM" prefix for CITS-3DPM
-                if (Character.isDigit(c) && i > 2) {
+                if (Character.isDigit(c) && i > 1) {
                     numBuff.append(c);
                     isPrefix = false;
                 } else if (isPrefix) {
@@ -269,7 +269,7 @@ public final class Requirement {
          *                    the description to set
          */
         public Builder description(final String dscrptn) {
-            if (dscrptn == null || dscrptn.isEmpty())
+            if (dscrptn == null || dscrptn.isBlank())
                 return this;
             this.description.add(this.descParts + dscrptn);
             this.descParts = "";
