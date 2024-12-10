@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author  <a href="mailto:carl@openpreservation.org">Carl Wilson</a>
@@ -71,7 +72,25 @@ public final class ControlledVocabulary {
 			return new ControlledVocabulary(this.ident, this.nm, this.mntnceAgncy, this.ri, this.cntxt, this.desc);
 		}
 	}
-	public final String id;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, maintenanceAgency, uri, context);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!(obj instanceof ControlledVocabulary))
+            return false;
+        ControlledVocabulary other = (ControlledVocabulary) obj;
+        return Objects.equals(id, other.id) && Objects.equals(name, other.name)
+                && Objects.equals(maintenanceAgency, other.maintenanceAgency) && Objects.equals(uri, other.uri)
+                && Objects.equals(context, other.context);
+    }
+
+    public final String id;
 	public final String name;
 	public final String maintenanceAgency;
 	public final URI uri;

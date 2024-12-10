@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import eu.dilcis.csip.profile.Appendix;
 import eu.dilcis.csip.profile.ControlledVocabulary;
@@ -76,7 +78,7 @@ final class MetsSource extends Source {
     }
 
     private void serialiseAppendices(final Writer dest, final Map<String, Object> context) throws IOException {
-        final List<Appendix> appendices = new ArrayList<>();
+        final Set<Appendix> appendices = new HashSet<>();
         for (final MetsProfile profile : this.profiles) {
             appendices.addAll(profile.getAppendices());
         }
@@ -85,7 +87,7 @@ final class MetsSource extends Source {
     }
 
     private void serialiseExternalSchema(final Writer dest, final Map<String, Object> context) throws IOException {
-        final List<ExternalSchema> schema = new ArrayList<>();
+        final Set<ExternalSchema> schema = new HashSet<>();
         for (final MetsProfile profile : this.profiles) {
             schema.addAll(profile.getSchema());
         }
@@ -94,7 +96,7 @@ final class MetsSource extends Source {
     }
 
     private void serialiseVocabs(final Writer dest, final Map<String, Object> context) throws IOException {
-        final List<ControlledVocabulary> vocabularies = new ArrayList<>();
+        final Set<ControlledVocabulary> vocabularies = new HashSet<>();
         for (final MetsProfile profile : this.profiles) {
             vocabularies.addAll(profile.getVocabularies());
         }

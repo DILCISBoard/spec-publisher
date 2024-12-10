@@ -21,8 +21,11 @@ public class Profiles {
         final Set<Example> examples = new HashSet<>();
         for (final Requirement requirement : requirements) {
             for (final MetsProfile profile : profiles) {
-                for (final String exampleId : requirement.examples) {
-                    examples.add(profile.getExampleById(exampleId));
+                if (profile.getRequirementById(requirement.id) != null) {
+                    for (final String exampleId : requirement.examples) {
+                        Example example = profile.getExampleById(exampleId);
+                        examples.add(example);
+                    }
                 }
             }
         }

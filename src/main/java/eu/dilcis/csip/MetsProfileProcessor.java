@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.xml.sax.SAXException;
@@ -50,6 +51,37 @@ public final class MetsProfileProcessor implements Callable<Integer> {
         System.exit(exitCode);
     }
 
+    private static void serialiseProfile(final Set<Entry<Part, List<Source>>> entries, final boolean isPdf, final Path root)
+            throws IOException {
+        for (final Entry<Part, List<Source>> entry : entries) {
+            try (Writer writer = new FileWriter(root.resolve(entry.getKey().getFileName()).toFile())) {
+                serialisePart(entry.getKey(), entry.getValue(), isPdf, writer);
+            }
+        }
+    }
+
+    private static void serialisePart(final Part part, final List<Source> sources, final boolean isPdf,
+            final Writer writer) throws IOException {
+        boolean isFirst = true;
+        for (final Source section : sources) {
+            if (Part.APPENDICES.equals(part)) {
+                final Map<String, Object> context = new java.util.HashMap<>();
+                context.put("heading", section.heading);
+                context.put("label", section.label);
+                context.put("isFirst", isFirst);
+                isFirst = false;
+                Utilities.serialiseToTemplate("eu/dilcis/csip/out/appendix_heading.mustache", context,
+                        writer);
+            }
+            section.serialise(writer, isPdf);
+            writer.write("\n");
+        }
+        if (Part.BODY.equals(part)) {
+            writer.write("!INCLUDE \"appendices.md\"\n");
+        }
+        writer.flush();
+    }
+
     @Parameters(paramLabel = "FILE", arity = "1..*", description = "A list of METS Profile documents to be processed.")
     private File[] metsProfiles;
 
@@ -75,54 +107,8 @@ public final class MetsProfileProcessor implements Callable<Integer> {
         try {
             final StructFileParser structParser = StructFileParser.parserInstance(this.processProfiles());
             final SpecificationStructure specStructure = structParser.parseStructureFile(this.structureFile.toPath());
-            boolean isFirst = true;
-            for (Entry<Part, List<Source>> entry : specStructure.content.entrySet()) {
-                try (Writer writer = new FileWriter(this.destination.resolve(entry.getKey().getFileName()).toFile())) {
-                    if (Part.BODY.equals(entry.getKey())) {
-                        writer.write("!TOC\n\n");
-                    }
-                    for (Source section : entry.getValue()) {
-                        if (Part.APPENDICES.equals(entry.getKey())) {
-                            Map<String, Object> context = new java.util.HashMap<>();
-                            context.put("heading", section.heading);
-                            context.put("label", section.label);
-                            context.put("isFirst", isFirst);
-                            isFirst = false;
-                            Utilities.serialiseToTemplate("eu/dilcis/csip/out/appendix_heading.mustache", context,
-                                    writer);
-                        }
-                        section.serialise(writer, false);
-                        writer.write("\n");
-                    }
-                    if (Part.BODY.equals(entry.getKey())) {
-                        writer.write("!INCLUDE \"appendices.md\"\n");
-                    }
-                    writer.flush();
-                }
-            }
-            for (Entry<Part, List<Source>> entry : specStructure.content.entrySet()) {
-                isFirst = true;
-                try (Writer writer = new FileWriter(
-                        this.destination.resolve("../pdf").resolve(entry.getKey().getFileName()).toFile())) {
-                    for (Source section : entry.getValue()) {
-                        if (Part.APPENDICES.equals(entry.getKey())) {
-                            Map<String, Object> context = new java.util.HashMap<>();
-                            context.put("heading", section.heading);
-                            context.put("label", section.label);
-                            context.put("isFirst", isFirst);
-                            isFirst = false;
-                            Utilities.serialiseToTemplate("eu/dilcis/csip/out/appendix_heading.mustache", context,
-                                    writer);
-                        }
-                        section.serialise(writer, true);
-                        writer.write("\n");
-                    }
-                    if (Part.BODY.equals(entry.getKey())) {
-                        writer.write("!INCLUDE \"appendices.md\"\n");
-                    }
-                    writer.flush();
-                }
-            }
+            serialiseProfile(specStructure.content.entrySet(), false, this.destination);
+            serialiseProfile(specStructure.content.entrySet(), true, this.destination.resolve("../pdf"));
         } catch (SAXException | IOException excep) {
             // Basic for now, print the stack trace and trhow it
             excep.printStackTrace();
@@ -136,9 +122,9 @@ public final class MetsProfileProcessor implements Callable<Integer> {
 
     private List<MetsProfile> processProfiles() throws SAXException, IOException {
         final List<MetsProfile> profiles = new ArrayList<>();
-        final MetsProfileParser parser = MetsProfileParser.newInstance();
         for (final File profileXmlFile : this.metsProfiles) {
             try {
+                final MetsProfileParser parser = MetsProfileParser.newInstance();
                 final MetsProfile profile = parser.processXmlProfile(profileXmlFile.toPath());
                 profiles.add(profile);
             } catch (SAXException | IOException excep) {

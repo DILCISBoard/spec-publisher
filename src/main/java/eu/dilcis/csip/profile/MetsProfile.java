@@ -26,7 +26,8 @@ public final class MetsProfile {
 
     public static MetsProfile fromValues(final Details details, final List<Details> relatedProfiles,
             final List<Requirement> requirements, final Map<String, Example> examples,
-            final List<Appendix> appendices, final List<ExternalSchema> schemas, final List<ControlledVocabulary> vocabularies) {
+            final List<Appendix> appendices, final List<ExternalSchema> schemas,
+            final List<ControlledVocabulary> vocabularies) {
         return new MetsProfile(details, relatedProfiles, requirements, examples, appendices, schemas, vocabularies);
     }
 
@@ -48,10 +49,10 @@ public final class MetsProfile {
         this.relatedProfiles = relatedProfiles;
         this.orderedRequirements = requirements.stream().map(r -> r.id).collect(Collectors.toList());
         this.requirements = requirements.stream().collect(Collectors.toMap(r -> r.id, r -> r));
-        this.examples = examples;
-        this.appendices = appendices;
-        this.schemas = schemas;
-        this.vocabularies = vocabularies;
+        this.examples = Collections.unmodifiableMap(null == examples ? Map.of() : examples);
+        this.appendices = Collections.unmodifiableList(null == appendices ? List.of() : appendices);
+        this.schemas = Collections.unmodifiableList(null == schemas ? List.of() : schemas);
+        this.vocabularies = Collections.unmodifiableList(null == vocabularies ? List.of() : vocabularies);
     }
 
     public final List<Requirement> getRequirements() {
