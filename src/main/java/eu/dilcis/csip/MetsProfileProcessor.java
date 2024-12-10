@@ -51,7 +51,8 @@ public final class MetsProfileProcessor implements Callable<Integer> {
         System.exit(exitCode);
     }
 
-    private static void serialiseProfile(final Set<Entry<Part, List<Source>>> entries, final boolean isPdf, final Path root)
+    private static void serialiseProfile(final Set<Entry<Part, List<Source>>> entries, final boolean isPdf,
+            final Path root)
             throws IOException {
         for (final Entry<Part, List<Source>> entry : entries) {
             try (Writer writer = new FileWriter(root.resolve(entry.getKey().getFileName()).toFile())) {
@@ -64,6 +65,9 @@ public final class MetsProfileProcessor implements Callable<Integer> {
             final Writer writer) throws IOException {
         boolean isFirst = true;
         for (final Source section : sources) {
+            if (!isPdf && Part.BODY.equals(part)) {
+                writer.write("!TOC\n\n");
+            }
             if (Part.APPENDICES.equals(part)) {
                 final Map<String, Object> context = new java.util.HashMap<>();
                 context.put("heading", section.heading);
