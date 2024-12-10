@@ -8,7 +8,7 @@ A visualisation of the current specification network can be seen here:
 <a name="figi-dip"></a>
 ![OAIS Entities](figs/fig_1_dip.png "Diagram showing E-ARK specification dependency hierarchy")
 
-**Figure I:** Diagram showing E-ARK specification dependency hierarchy. Note that the image only shows a selection of the published CITS and isn't an exhaustive list.
+**Figure 1:** Diagram showing E-ARK specification dependency hierarchy. Note that the image only shows a selection of the published CITS and isn't an exhaustive list.
 
 ### Overview of the E-ARK Specifications
 
