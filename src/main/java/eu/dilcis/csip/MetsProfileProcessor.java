@@ -64,10 +64,10 @@ public final class MetsProfileProcessor implements Callable<Integer> {
     private static void serialisePart(final Part part, final List<Source> sources, final boolean isPdf,
             final Writer writer) throws IOException {
         boolean isFirst = true;
+        if (!isPdf && Part.BODY.equals(part)) {
+            writer.write("!TOC\n\n");
+        }
         for (final Source section : sources) {
-            if (!isPdf && Part.BODY.equals(part)) {
-                writer.write("!TOC\n\n");
-            }
             if (Part.APPENDICES.equals(part)) {
                 final Map<String, Object> context = new java.util.HashMap<>();
                 context.put("heading", section.heading);
