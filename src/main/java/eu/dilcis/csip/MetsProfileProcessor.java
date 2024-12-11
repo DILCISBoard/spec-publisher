@@ -86,8 +86,8 @@ public final class MetsProfileProcessor implements Callable<Integer> {
         writer.flush();
     }
 
-    @Parameters(paramLabel = "FILE", arity = "1..*", description = "A list of METS Profile documents to be processed.")
-    private File[] metsProfiles;
+    @Parameters(paramLabel = "FILE", arity = "0..*", description = "A list of METS Profile documents to be processed.")
+    private File[] metsProfiles = new File[0];
 
     @Option(names = { "-f",
             "--file" }, required = true, paramLabel = "SPECIFICATION", description = "A YAML file that describes the specification structure.")
