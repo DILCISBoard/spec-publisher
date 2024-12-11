@@ -52,17 +52,18 @@ public final class MetsProfileProcessor implements Callable<Integer> {
     }
 
     private static void serialiseProfile(final Set<Entry<Part, List<Source>>> entries, final boolean isPdf,
+            final boolean hasAppendices,
             final Path root)
             throws IOException {
         for (final Entry<Part, List<Source>> entry : entries) {
             try (Writer writer = new FileWriter(root.resolve(entry.getKey().getFileName()).toFile())) {
-                serialisePart(entry.getKey(), entry.getValue(), isPdf, writer);
+                serialisePart(entry.getKey(), entry.getValue(), isPdf, hasAppendices, writer);
             }
         }
     }
 
     private static void serialisePart(final Part part, final List<Source> sources, final boolean isPdf,
-            final Writer writer) throws IOException {
+            final boolean hasAppendices, final Writer writer) throws IOException {
         boolean isFirst = true;
         if (!isPdf && Part.BODY.equals(part)) {
             writer.write("!TOC\n\n");
@@ -80,7 +81,7 @@ public final class MetsProfileProcessor implements Callable<Integer> {
             section.serialise(writer, isPdf);
             writer.write("\n");
         }
-        if (Part.BODY.equals(part)) {
+        if (Part.BODY.equals(part) && hasAppendices) {
             writer.write("!INCLUDE \"appendices.md\"\n");
         }
         writer.flush();
@@ -111,8 +112,10 @@ public final class MetsProfileProcessor implements Callable<Integer> {
         try {
             final StructFileParser structParser = StructFileParser.parserInstance(this.processProfiles());
             final SpecificationStructure specStructure = structParser.parseStructureFile(this.structureFile.toPath());
-            serialiseProfile(specStructure.content.entrySet(), false, this.destination);
-            serialiseProfile(specStructure.content.entrySet(), true, this.destination.resolve("../pdf"));
+            serialiseProfile(specStructure.content.entrySet(), false,
+                    specStructure.content.containsKey(Part.APPENDICES), this.destination);
+            serialiseProfile(specStructure.content.entrySet(), true, specStructure.content.containsKey(Part.APPENDICES),
+                    this.destination.resolve("../pdf"));
         } catch (SAXException | IOException excep) {
             // Basic for now, print the stack trace and trhow it
             excep.printStackTrace();
