@@ -37,7 +37,6 @@ public final class Appendix {
 
     public final int number;
     public final String label;
-
     public final List<String> content;
 
     private Appendix(final int number, final String label, final List<String> content) {
