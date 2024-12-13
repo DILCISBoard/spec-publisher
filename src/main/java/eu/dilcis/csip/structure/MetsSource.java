@@ -2,12 +2,10 @@ package eu.dilcis.csip.structure;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -79,8 +77,11 @@ final class MetsSource extends Source {
 
     private void serialiseAppendices(final Writer dest, final Map<String, Object> context) throws IOException {
         final Set<Appendix> appendices = new HashSet<>();
+        int number = 0;
         for (final MetsProfile profile : this.profiles) {
-            appendices.addAll(profile.getAppendices());
+            for (final Appendix appendix : profile.getAppendices()) {
+                appendices.add(Appendix.fromValues(++number, appendix.label, appendix.content));
+            }
         }
         context.put("appendices", appendices);
         Utilities.serialiseToTemplate("eu/dilcis/csip/out/appendices.mustache", context, dest);
