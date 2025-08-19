@@ -1,26 +1,10 @@
 ---
-body:
-  - name: context
-    type: file
-    source: context/index.md
-
-  - name: requirements.structure
-    type: file
-    source: requirements/structure/index.md
-
-  - name: requirements.METS.package_reps
-    type: file
-    source: requirements/METS/package_reps/index.md
-
+tables:
   - name: requirements.METS.package_reps
     type: requirements
     heading: "Table 2: Geospatial information package requirement"
     requirements:
       - GEO_1
-
-  - name: requirements.METS.package
-    type: file
-    source: requirements/METS/package/index.md
 
   - name: requirements.METS.package
     type: requirements

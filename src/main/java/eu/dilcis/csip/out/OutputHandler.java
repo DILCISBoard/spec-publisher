@@ -23,9 +23,9 @@ import eu.dilcis.csip.profile.Section;
 public final class OutputHandler {
 	private static final String LINE_SEP_PROP = "line.separator"; //$NON-NLS-1$
 	private static final String LINE_END = System.getProperty(LINE_SEP_PROP);
-	private static final String MD_EXT = ".md"; //$NON-NLS-1$
-	private static final String REQUIREMENTS_MD = "requirements" + MD_EXT; //$NON-NLS-1$
-	private static final String EXAMPLES_MD = "examples" + MD_EXT; //$NON-NLS-1$
+	private static final String ASCIIDOC_EXT = ".adoc"; //$NON-NLS-1$
+	private static final String REQUIREMENTS_ASCIIDOC = "requirements" + ASCIIDOC_EXT; //$NON-NLS-1$
+	private static final String EXAMPLES_ASCIIDOC = "examples" + ASCIIDOC_EXT; //$NON-NLS-1$
 	public static OutputHandler toStdOut() {
 		return new OutputHandler();
 	}
@@ -33,13 +33,13 @@ public final class OutputHandler {
 	public static OutputHandler toSectionRequirements(final Path projRoot,
 			final Section sect) throws IOException {
 		return new OutputHandler(getSectionPath(projRoot, sect.sectName)
-				.resolve(Paths.get(REQUIREMENTS_MD)).toFile());
+				.resolve(Paths.get(REQUIREMENTS_ASCIIDOC)).toFile());
 	}
 
 	public static OutputHandler toSectionExamples(final Path projRoot, final Section sect)
 			throws IOException {
 		return new OutputHandler(getSectionPath(projRoot, sect.sectName)
-				.resolve(Paths.get(EXAMPLES_MD)).toFile());
+				.resolve(Paths.get(EXAMPLES_ASCIIDOC)).toFile());
 	}
 
 	// ===========================================================
@@ -49,7 +49,7 @@ public final class OutputHandler {
 	public static OutputHandler toAppendix(final Path metsReqRoot,
 			final String appndxName) throws IOException {
 		return new OutputHandler(metsReqRoot.resolve(Paths.get("specification",
-				"appendices", appndxName, appndxName + MD_EXT)).toFile());
+				"appendices", appndxName, appndxName + ASCIIDOC_EXT)).toFile());
 	}
 
 	private static Path getSectionPath(final Path projRoot,

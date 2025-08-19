@@ -1,28 +1,27 @@
-<table>
-  <caption>{{ caption }}</caption>
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Name, Location &amp; Description</th>
-      <th>Card &amp; Level</th>
-    </tr>
-  </thead>
-  <tbody>
-  {{#requirements}}
-    <tr>
-      <td><a name="{{ id }}">{{ id }}</a></td>
-      <td>
-        <strong>{{ details.name }}</strong><br/>
-        {{#xPath}}`{{ xPath }}`{{/xPath}}{{^xPath}}`N/A`{{/xPath}}
-        {{#description}}
-        <br/>{{.}}
-        {{/description}}
-      </td>
-      <td>
-        <strong>{{ cardinality }}</strong><br/>
-        {{ details.level }}
-      </td>
-    </tr>
-  {{/requirements}}
-  </tbody>
-</table>
+
+{{#headed}}
+{{{ heading }}}
+{{/headed}}
+[%header,cols="1,4,2"]
+|===
+|ID |Name, Location & Description |Card & Level
+
+{{#requirements}}
+|[#{{ id }}]**{{ id }}**
+|**{{{ details.name }}}** +
+{{#xPath}}`{{{ xPath }}}`{{/xPath}}{{^xPath}}`N/A`{{/xPath}} +
+{{#description}}{{{.}}}{{/description}}
+| **{{#cardinality}}{{ cardinality }}{{/cardinality}}{{^cardinality}}N/A{{/cardinality}}** +
+{{ details.level }}
+{{/requirements}}
+|===
+{{#examples}}
+
+**Example:** {{{ label }}}
+[source,xml]
+----
+{{#content}}
+{{{ . }}}
+{{/content}}
+----
+{{/examples}}

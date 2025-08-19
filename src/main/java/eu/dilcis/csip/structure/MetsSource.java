@@ -33,11 +33,11 @@ final class MetsSource extends Source {
     }
 
     @Override
-    public void serialise(final Writer destination, final boolean isPdf) throws IOException {
+    public void serialise(final Writer destination) throws IOException {
         final Map<String, Object> context = new HashMap<>();
         context.put("label", label);
         context.put("name", name);
-        context.put("pdf", isPdf);
+        context.put("heading", heading);
 
         if ("Appendix".equals(section)) {
             serialiseAppendices(destination, context);

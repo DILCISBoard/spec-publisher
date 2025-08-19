@@ -113,10 +113,10 @@ public class StructFileParserTest {
         InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/section.yaml");
         SpecificationStructure structure = parser.fromYamlStream(is, STRUCT_ROOT);
         assertNotNull(structure);
-        assertEquals("Parsed Structure should have 1 section", 1, structure.content.size());
-        Source section = structure.content.get(Part.BODY).get(0);
+        assertEquals("Parsed Structure should have 2 sections", 2, structure.content.size());
+        Source section = structure.content.get(Part.TABLES).get(0);
         assertNotNull(section);
-        assertEquals("context", section.name);
+        assertEquals("metadata-root-requirments", section.name);
     }
 
     @Test(expected = ParseException.class)
@@ -196,8 +196,8 @@ public class StructFileParserTest {
         InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/struct_test.yaml");
         SpecificationStructure structure = parser.fromYamlStream(is, STRUCT_ROOT);
         assertNotNull(structure);
-        assertEquals("Parsed Structure should have 6 sections", 6, structure.content.get(Part.BODY).size());
-        for (Source section : structure.content.get(Part.BODY)) {
+        assertEquals("Parsed Structure should have 2 sections", 2, structure.content.get(Part.TABLES).size());
+        for (Source section : structure.content.get(Part.TABLES)) {
             assertNotNull(section);
             assertNotNull(section.name);
             assertNotNull(section.type);
@@ -208,7 +208,7 @@ public class StructFileParserTest {
     public void testTableGenerator() throws ParseException, IOException {
         InputStream is = ClassLoader.getSystemResourceAsStream("eu/dilcis/csip/structure/struct_test.yaml");
         SpecificationStructure structure = parser.fromYamlStream(is, STRUCT_ROOT);
-        for (Source section : structure.content.get(Part.BODY)) {
+        for (Source section : structure.content.get(Part.TABLES)) {
             if (section instanceof RequirementsSource) {
                 RequirementsSource table = (RequirementsSource) section;
                 String html = SpecificationStructure.tableStringFromTemplate(table);
