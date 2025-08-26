@@ -261,7 +261,7 @@ public final class MetsProfileParser extends DefaultHandler {
                 break;
             case XmlConstants.ANCHOR_ELE:
                 final String buffVal = this.charBuff.getBufferValue();
-                this.reqBuilder.descPart(" [" + buffVal + "](" + this.currentHref + ") ");
+                this.reqBuilder.descPart(" " + this.currentHref + "[" + buffVal + "]");
                 break;
             default:
                 break;

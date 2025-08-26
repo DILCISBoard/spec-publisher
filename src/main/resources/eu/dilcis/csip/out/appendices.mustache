@@ -1,10 +1,13 @@
-{{#appendices}}
-### Example {{ number }}: {{ label }}
+{{>appendix_heading}}
 
-```xml
+{{#appendices}}
+=== Example {{ number }}: {{ label }}
+
+[source,xml]
+----
 {{#content}}
 {{{.}}}
 {{/content}}
-```
+----
 
 {{/appendices}}

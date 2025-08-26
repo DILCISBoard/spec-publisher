@@ -4,10 +4,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.FileSystemException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -21,7 +22,6 @@ import eu.dilcis.csip.structure.Source;
 import eu.dilcis.csip.structure.SpecificationStructure;
 import eu.dilcis.csip.structure.SpecificationStructure.Part;
 import eu.dilcis.csip.structure.StructFileParser;
-import eu.dilcis.csip.structure.Utilities;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -51,39 +51,28 @@ public final class MetsProfileProcessor implements Callable<Integer> {
         System.exit(exitCode);
     }
 
-    private static void serialiseProfile(final Set<Entry<Part, List<Source>>> entries, final boolean isPdf,
+    private static void serialiseProfile(final Set<Entry<Part, List<Source>>> entries,
             final boolean hasAppendices,
             final Path root)
             throws IOException {
         for (final Entry<Part, List<Source>> entry : entries) {
-            try (Writer writer = new FileWriter(root.resolve(entry.getKey().getFileName()).toFile())) {
-                serialisePart(entry.getKey(), entry.getValue(), isPdf, hasAppendices, writer);
+            Path destFolder = root.resolve(entry.getKey().getFolderName());
+            if (!Files.isDirectory(destFolder) && !destFolder.toFile().mkdirs()) {
+                throw new FileSystemException(destFolder.toString(), entry.getKey().getFolderName(),
+                        "Failed to create destination folder for " + entry.getKey().getFolderName());
+            }
+            for (final Source source : entry.getValue()) {
+                try (Writer writer = new FileWriter(destFolder.resolve(source.fileName()).toFile())) {
+                    serialisePart(entry.getKey(), source, hasAppendices, writer);
+                }
             }
         }
     }
 
-    private static void serialisePart(final Part part, final List<Source> sources, final boolean isPdf,
+    private static void serialisePart(final Part part, final Source source,
             final boolean hasAppendices, final Writer writer) throws IOException {
-        boolean isFirst = true;
-        if (!isPdf && Part.BODY.equals(part)) {
-            writer.write("!TOC\n\n");
-        }
-        for (final Source section : sources) {
-            if (Part.APPENDICES.equals(part)) {
-                final Map<String, Object> context = new java.util.HashMap<>();
-                context.put("heading", section.heading);
-                context.put("label", section.label);
-                context.put("isFirst", isFirst);
-                isFirst = false;
-                Utilities.serialiseToTemplate("eu/dilcis/csip/out/appendix_heading.mustache", context,
-                        writer);
-            }
-            section.serialise(writer, isPdf);
-            writer.write("\n");
-        }
-        if (Part.BODY.equals(part) && hasAppendices) {
-            writer.write("!INCLUDE \"appendices.md\"\n");
-        }
+        source.serialise(writer);
+        writer.write("\n");
         writer.flush();
     }
 
@@ -112,10 +101,8 @@ public final class MetsProfileProcessor implements Callable<Integer> {
         try {
             final StructFileParser structParser = StructFileParser.parserInstance(this.processProfiles());
             final SpecificationStructure specStructure = structParser.parseStructureFile(this.structureFile.toPath());
-            serialiseProfile(specStructure.content.entrySet(), false,
+            serialiseProfile(specStructure.content.entrySet(),
                     specStructure.content.containsKey(Part.APPENDICES), this.destination);
-            serialiseProfile(specStructure.content.entrySet(), true, specStructure.content.containsKey(Part.APPENDICES),
-                    this.destination.resolve("../pdf"));
         } catch (SAXException | IOException excep) {
             // Basic for now, print the stack trace and trhow it
             excep.printStackTrace();

@@ -37,7 +37,11 @@ public abstract class Source {
         this.label = label;
     }
 
-    public abstract void serialise(final Writer destination, final boolean isPdf) throws IOException;
+    public abstract void serialise(final Writer destination) throws IOException;
+
+    public String fileName() {
+        return this.name.toLowerCase() + ".adoc";
+    }
 
     @Override
     public final int hashCode() {

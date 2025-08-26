@@ -18,7 +18,7 @@ final class FileSource extends Source {
     }
 
     @Override
-    public void serialise(final Writer destination, final boolean isPdf) throws IOException {
+    public void serialise(final Writer destination) throws IOException {
         try (FileReader reader = new FileReader(this.filePath.toFile())) {
             reader.transferTo(destination);
         }

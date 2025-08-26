@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public final class SpecificationStructure {
     public enum Part {
-        PREFACE, BODY, APPENDICES, POSTFACE;
+        TABLES, APPENDICES;
 
         static final Part fromString(final String partName) throws ParseException {
             if (partName != null) {
@@ -22,8 +22,8 @@ public final class SpecificationStructure {
             throw new ParseException("Invalid part: " + partName);
         }
 
-        public String getFileName() {
-            return this.name().toLowerCase() + ".md";
+        public String getFolderName() {
+            return this.name().toLowerCase();
         }
     }
 
@@ -33,7 +33,7 @@ public final class SpecificationStructure {
 
     static String tableStringFromTemplate(final RequirementsSource table) throws IOException {
         try (final StringWriter writer = new StringWriter()) {
-            table.serialise(writer, false);
+            table.serialise(writer);
             return writer.toString();
         }
     }

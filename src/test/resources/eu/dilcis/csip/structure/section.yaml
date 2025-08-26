@@ -1,6 +1,16 @@
 ---
-body:
-  - name: context
-    type: file
-    source: context/index.md
+tables:
+  - name: metadata-root-requirments
+    heading: "### Node level: mets root"
+    type: requirements
+    section: metsRootElement
+    examples: true
+    dest: specification/metadata-root-requirments.md
 
+appendices:
+  - name: mets.examples
+    heading: "E-ARK Information Package METS Example"
+    label: "A"
+    type: mets
+    section: Appendix
+    dest: specification/appendices/mets-examples.md
