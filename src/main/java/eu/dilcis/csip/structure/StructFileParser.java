@@ -36,7 +36,7 @@ public final class StructFileParser {
         if (!Files.exists(source) || Files.isDirectory(source)) {
             throw new IllegalArgumentException("File does not exist, or is a directory: " + source);
         }
-        this.root = source.toFile().getParentFile().toPath();
+        this.root = source.toAbsolutePath().toFile().getParentFile().toPath();
         return this.fromSource(source);
     }
 
