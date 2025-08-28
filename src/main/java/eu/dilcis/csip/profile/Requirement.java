@@ -404,7 +404,7 @@ public final class Requirement {
         return location;
     }
 
-    public String getAsciidocDescription() {
+    public String getAsciiDocDescription() {
         return String.join(" +\n", this.description);
     }
 
