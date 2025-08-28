@@ -404,6 +404,10 @@ public final class Requirement {
         return location;
     }
 
+    public String getAsciidocDescription() {
+        return String.join(" +\n", this.description);
+    }
+
     public String[] relatedMatter() {
         if (this.relMat == null || this.relMat.isEmpty())
             return new String[] {};
