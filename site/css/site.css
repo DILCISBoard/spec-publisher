@@ -144,3 +144,19 @@ blockquote:before {
 blockquote p {
   display: inline;
 }
+
+div#toctitle {
+  font-size: 2rem;
+  font-weight: 500;
+  margin-bottom: .5rem;
+  margin-top: 0;
+}
+
+div.imageblock {
+  text-align: center;
+}
+
+div.imageblock div.title {
+  padding-bottom: 1rem;
+  font-weight: 600;
+}
