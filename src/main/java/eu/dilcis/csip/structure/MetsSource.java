@@ -39,13 +39,13 @@ final class MetsSource extends Source {
         context.put("name", name);
         context.put("heading", heading);
 
-        if ("Appendix".equals(section)) {
+        if ("Appendix".equalsIgnoreCase(section)) {
             serialiseAppendices(destination, context);
-        } else if ("external_schema".equals(section)) {
+        } else if ("external_schema".equalsIgnoreCase(section)) {
             serialiseExternalSchema(destination, context);
-        } else if ("vocabulary".equals(section)) {
+        } else if ("vocabulary".equalsIgnoreCase(section)) {
             serialiseVocabs(destination, context);
-        } else if ("requirements".equals(section)) {
+        } else if ("requirements".equalsIgnoreCase(section)) {
             for (MetsProfile profile : this.profiles) {
                 context.put("profile", profile);
                 context.put("requirements", profile.getRequirements());

@@ -7,10 +7,9 @@ This document is one of several related specifications which aim to provide a co
 The specifications are designed to help data creators, software developers, and digital archives to tackle the challenge of short-, medium- and long-term data management and reuse in a sustainable, authentic, cost-efficient, manageable and interoperable way.
 A visualisation of the current specification network can be seen here:
 
-+++<a name="figi-dip">++++++</a>+++
-image:figs/fig_1_dip.svg[OAIS Entities]
-
-*Figure 1:* Diagram showing E-ARK specification dependency hierarchy. Note that the image only shows a selection of the published CITS and isn't an exhaustive list.
+.Diagram showing E-ARK specification dependency hierarchy. Note that the image only shows a selection of the published CITS and isn't an exhaustive list.
+[#figi-dip]
+image::figs/fig_1_dip.svg[OAIS Entities]
 
 [discrete]
 ==== Overview of the E-ARK Specifications
